@@ -10,7 +10,7 @@ var lambdaOptions = {
     region: 'eu-west-1'
 };
 
-gulp.task('emailingest', function() {
+gulp.task('updateEmailIngest', function() {
     var Config = require('./email-signup-config');
 
     var emailIngestHandlerConfig = {
@@ -23,7 +23,7 @@ gulp.task('emailingest', function() {
         .pipe(gulp.dest('.'));
 });
 
-gulp.task('subscribehandler', function() {
+gulp.task('updateSubscribeHandler', function() {
     var Config = require('./email-signup-config');
 
     var subscribeHandlerConfig = {
@@ -42,7 +42,7 @@ gulp.task('subscribehandler', function() {
 });
 
 //Cloudformation Tasks
-gulp.task('buildcloudformation', function() {
+gulp.task('buildCloudformation', function() {
   return gulp.src('./cloudformation/*.yml')
     .pipe(yaml({ schema: 'DEFAULT_SAFE_SCHEMA' }))
     .pipe(gulp.dest('./dist'));
