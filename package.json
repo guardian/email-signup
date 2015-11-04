@@ -17,6 +17,7 @@
     "gulp-yaml": "^1.0.1",
     "gulp-zip": "^3.0.2",
     "npm": "~3.3.9",
+    "vinyl-fs": "^2.2.1",
     "vinyl-s3": "^0.3.0"
   },
   "dependencies": {
