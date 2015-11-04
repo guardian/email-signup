@@ -83,6 +83,10 @@ gulp.task('updateSubscribeHandler', function() {
         .pipe(lambda(subscribeHandlerConfig, lambdaOptions))
 });
 
+gulp.task('emailSubscribe', function(cb) {
+    runSequence('clean', 'buildSubscribeHandler', 'uploadSubscribeHandler', 'updateSubscribeHandler', cb);
+});
+
 //Cloudformation Tasks
 gulp.task('buildCloudformation', function() {
     return gulp.src('./cloudformation/*.yml')
