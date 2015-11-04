@@ -6,6 +6,7 @@ var yaml = require('gulp-yaml');
 var s3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
+var runSequence = require('gulp-run-sequence');
 
 var lambdaOptions = {
     region: 'eu-west-1'
@@ -32,13 +33,16 @@ gulp.task('uploadEmailIngestHandler', function() {
 
 gulp.task('updateEmailIngestHandler', function() {
     var Config = require('./email-signup-config');
-
     var emailIngestHandlerConfig = {
         FunctionName: Config.Lambda.emailIngestHandlerName
     };
 
     return gulp.src('dist/email-ingest-handler.zip')
         .pipe(lambda(emailIngestHandlerConfig, lambdaOptions))
+});
+
+gulp.task('emailIngest', function(cb) {
+    runSequence('buildEmailIngestHandler', 'uploadEmailIngestHandler', 'updateEmailIngestHandler', cb);
 });
 
 //Email Subscribe
