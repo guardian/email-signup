@@ -56,7 +56,7 @@ Resources:
       Code:
         S3Bucket:
           Ref: ArtifactBucket
-        S3Key: lambda/subscribe-handler.jar
+        S3Key: lambda/subscribe-handler.zip
 
   ## This mapping works, but there is no way to include aliases in cloudformation yet
   ## See http://docs.aws.amazon.com/lambda/latest/dg/aliases-intro.html
