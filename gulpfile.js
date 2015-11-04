@@ -7,10 +7,17 @@ var s3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
 var runSequence = require('gulp-run-sequence');
+var clean = require('gulp-clean');
 
 var lambdaOptions = {
     region: 'eu-west-1'
 };
+
+//Cleaning
+gulp.task('clean', function () {
+    return gulp.src('dist/', {read: false})
+        .pipe(clean());
+});
 
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', function() {
@@ -42,7 +49,7 @@ gulp.task('updateEmailIngestHandler', function() {
 });
 
 gulp.task('emailIngest', function(cb) {
-    runSequence('buildEmailIngestHandler', 'uploadEmailIngestHandler', 'updateEmailIngestHandler', cb);
+    runSequence('clean', 'buildEmailIngestHandler', 'uploadEmailIngestHandler', 'updateEmailIngestHandler', cb);
 });
 
 //Email Subscribe
