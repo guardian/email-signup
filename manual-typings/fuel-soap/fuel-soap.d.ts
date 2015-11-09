@@ -23,8 +23,8 @@ interface ListSubscriber {
 interface Subscriber {
     EmailAddress: string;
     SubscriberKey: string;
-    Lists: Array<ListSubscriber>;
-    Attributes: Array<ExtraAttribute>;
+    Lists?: Array<ListSubscriber>;
+    Attributes?: Array<ExtraAttribute>;
 }
 
 interface TriggeredSendDefinition {
