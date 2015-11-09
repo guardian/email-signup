@@ -19,7 +19,9 @@ var env = (function() {
   return process.argv.some(prod) ? 'PROD' : 'CODE';
 })();
 
-var Config = require('./email-signup-config')[env];
+var getConfig = function() {
+    return require('./email-signup-config')[env];
+};
 
 //Cleaning
 gulp.task('clean', function () {
@@ -47,7 +49,7 @@ gulp.task('uploadEmailIngestHandler', function() {
 
 gulp.task('updateEmailIngestHandler', function() {
     var emailIngestHandlerConfig = {
-        FunctionName: Config.Lambda.emailIngestHandlerName
+        FunctionName: getConfig().Lambda.emailIngestHandlerName
     };
 
     return gulp.src('dist/email-ingest-handler.zip')
@@ -79,7 +81,7 @@ gulp.task('uploadSubscribeHandler', function() {
 
 gulp.task('updateSubscribeHandler', function() {
     var subscribeHandlerConfig = {
-        FunctionName: Config.Lambda.exactTargetHandlerName,
+        FunctionName: getConfig().Lambda.exactTargetHandlerName,
         Timeout: 15
     };
 
