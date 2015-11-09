@@ -16,6 +16,7 @@
     "gulp-fail": "^1.0.1",
     "gulp-flatten": "^0.2.0",
     "gulp-run-sequence": "^0.3.2",
+    "gulp-typescript": "^2.9.2",
     "gulp-yaml": "^1.0.1",
     "gulp-zip": "^3.0.2",
     "npm": "~3.3.9",
