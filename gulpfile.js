@@ -13,6 +13,14 @@ var lambdaOptions = {
     region: 'eu-west-1'
 };
 
+var env = (function() {
+  function prod(str) { return /prod/gi.test(str); }
+
+  return process.argv.some(prod) ? 'PROD' : 'CODE';
+})();
+
+var Config = require('./email-signup-config')[env];
+
 //Cleaning
 gulp.task('clean', function () {
     return gulp.src('dist/', {read: false})
@@ -21,7 +29,6 @@ gulp.task('clean', function () {
 
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', function() {
-    var Config = require('./email-signup-config');
     return gulp.src([
             'email-signup-config.js',
             'emailingest.js',
@@ -39,7 +46,6 @@ gulp.task('uploadEmailIngestHandler', function() {
 });
 
 gulp.task('updateEmailIngestHandler', function() {
-    var Config = require('./email-signup-config');
     var emailIngestHandlerConfig = {
         FunctionName: Config.Lambda.emailIngestHandlerName
     };
@@ -54,7 +60,6 @@ gulp.task('emailIngest', function(cb) {
 
 //Email Subscribe
 gulp.task('buildSubscribeHandler', function() {
-    var Config = require('./email-signup-config');
     return gulp.src([
             'subscribehandler.js',
             'email-signup-config.js',
@@ -73,7 +78,6 @@ gulp.task('uploadSubscribeHandler', function() {
 });
 
 gulp.task('updateSubscribeHandler', function() {
-    var Config = require('./email-signup-config');
     var subscribeHandlerConfig = {
         FunctionName: Config.Lambda.exactTargetHandlerName,
         Timeout: 15
