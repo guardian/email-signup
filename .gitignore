@@ -1,3 +1,4 @@
 node_modules/
 dist/
 email-signup-config.js
+.idea/
