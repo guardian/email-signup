@@ -19,9 +19,11 @@ var env = (function() {
   return process.argv.some(prod) ? 'PROD' : 'CODE';
 })();
 
-var getConfig = function() {
-    return require('./email-signup-config')[env];
-};
+var configFile = 'email-signup-config-' + env + '.js';
+
+function getConfig() {
+  return require(configFile);
+}
 
 //Cleaning
 gulp.task('clean', function () {
@@ -32,7 +34,7 @@ gulp.task('clean', function () {
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', function() {
     return gulp.src([
-            'email-signup-config.js',
+            configFile,
             'emailingest.js',
             'node_modules/validator/*'])
         .pipe(zip('dist/email-ingest-handler.zip'))
@@ -64,7 +66,7 @@ gulp.task('emailIngest', function(cb) {
 gulp.task('buildSubscribeHandler', function() {
     return gulp.src([
             'subscribehandler.js',
-            'email-signup-config.js',
+            configFile,
             'node_modules/fuel-soap**/**/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/subscribe-handler.zip'))
@@ -102,7 +104,7 @@ gulp.task('buildCloudformation', function() {
 
 //Credentials
 gulp.task('downloadCredentials', function() {
-    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config.js', { buffer: false })
+    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js', { buffer: false })
         .pipe(flatten())
         .pipe(gulp.dest('.'));
 });
