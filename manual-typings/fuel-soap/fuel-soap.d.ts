@@ -1,41 +1,41 @@
 /// <reference path="../tsd.d.ts" />
 
-declare interface ExtraAttribute {
+interface ExtraAttribute {
     Name: string;
     Value: string;
 }
 
-declare interface ListSubscriber {
+interface ListSubscriber {
     ID: number;
     Status: string;
 }
 
-declare interface Subscriber {
+interface Subscriber {
     EmailAddress: string;
     SubscriberKey: string;
     Lists?: Array<ListSubscriber>;
     Attributes?: Array<ExtraAttribute>;
 }
 
-declare interface TriggeredSendDefinition {
+interface TriggeredSendDefinition {
     CustomerKey: string;
 }
 
-declare interface TriggeredSend {
+interface TriggeredSend {
     TriggeredSendDefinition: TriggeredSendDefinition;
     Subscribers: Array<Subscriber>;
 }
 
-declare interface SaveOptionProperty {
+interface SaveOptionProperty {
     PropertyName: string;
     SaveAction: string;
 }
 
-declare interface SaveOption {
+interface SaveOption {
     SaveOption: SaveOptionProperty;
 }
 
-declare interface CreateOption {
+interface CreateOption {
     SaveOptions: Array<SaveOption>;
 }
 
