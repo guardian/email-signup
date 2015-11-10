@@ -8,6 +8,7 @@ var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
 var runSequence = require('gulp-run-sequence');
 var clean = require('gulp-clean');
+var ts = require('gulp-typescript');
 
 var lambdaOptions = {
     region: 'eu-west-1'
@@ -21,9 +22,9 @@ gulp.task('clean', function () {
 
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', function() {
-    var Config = require('./email-signup-config');
+    var Config = require('./node_modules/email-signup-config');
     return gulp.src([
-            'email-signup-config.js',
+            'node_modules/email-signup-config.js',
             'emailingest.js',
             'node_modules/validator/*'])
         .pipe(zip('dist/email-ingest-handler.zip'))
@@ -39,7 +40,7 @@ gulp.task('uploadEmailIngestHandler', function() {
 });
 
 gulp.task('updateEmailIngestHandler', function() {
-    var Config = require('./email-signup-config');
+    var Config = require('./node_modules/email-signup-config');
     var emailIngestHandlerConfig = {
         FunctionName: Config.Lambda.emailIngestHandlerName
     };
@@ -54,10 +55,10 @@ gulp.task('emailIngest', function(cb) {
 
 //Email Subscribe
 gulp.task('buildSubscribeHandler', function() {
-    var Config = require('./email-signup-config');
+    var Config = require('./node_modules/email-signup-config');
     return gulp.src([
-            'subscribehandler.js',
-            'email-signup-config.js',
+            'built/triggersubscriberhandler.js',
+            'node_modules/email-signup-config.js',
             'node_modules/fuel-soap**/**/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/subscribe-handler.zip'))
@@ -73,9 +74,9 @@ gulp.task('uploadSubscribeHandler', function() {
 });
 
 gulp.task('updateSubscribeHandler', function() {
-    var Config = require('./email-signup-config');
+    var Config = require('./node_modules/email-signup-config');
     var subscribeHandlerConfig = {
-        FunctionName: Config.Lambda.exactTargetHandlerName,
+        FunctionName: Config.CODE.Lambda.exactTargetHandlerName,
         Timeout: 15
     };
 
@@ -98,5 +99,14 @@ gulp.task('buildCloudformation', function() {
 gulp.task('downloadCredentials', function() {
     return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config.js', { buffer: false })
         .pipe(flatten())
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest('./node_modules'));
+});
+
+gulp.task('typescript', function () {
+    return gulp.src('src/triggersubscriberhandler.ts')
+        .pipe(ts({
+            noImplicitAny: true,
+            module: 'commonjs'
+        }))
+        .pipe(gulp.dest('built'));
 });
