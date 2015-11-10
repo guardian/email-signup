@@ -8,6 +8,7 @@ var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
 var runSequence = require('gulp-run-sequence');
 var clean = require('gulp-clean');
+var rename = require('gulp-rename');
 
 var lambdaOptions = {
     region: 'eu-west-1'
@@ -19,10 +20,11 @@ var env = (function() {
   return process.argv.some(prod) ? 'PROD' : 'CODE';
 })();
 
-var configFile = 'email-signup-config-' + env + '.js';
+var envConfig = 'email-signup-config-' + env + '.js';
+var config = 'email-signup-config.js';
 
 function getConfig() {
-  return require(configFile);
+  return require(envConfig);
 }
 
 //Cleaning
@@ -31,10 +33,16 @@ gulp.task('clean', function () {
         .pipe(clean());
 });
 
+gulp.task('writeConfig', function() {
+    return gulp.src(envConfig)
+        .pipe(rename(config))
+        .pipe(gulp.dest('.'));
+});
+
 //Email Ingestion
-gulp.task('buildEmailIngestHandler', function() {
+gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
     return gulp.src([
-            configFile,
+            config,
             'emailingest.js',
             'node_modules/validator/*'])
         .pipe(zip('dist/email-ingest-handler.zip'))
@@ -63,10 +71,10 @@ gulp.task('emailIngest', function(cb) {
 });
 
 //Email Subscribe
-gulp.task('buildSubscribeHandler', function() {
+gulp.task('buildSubscribeHandler', ['writeConfig'], function() {
     return gulp.src([
             'subscribehandler.js',
-            configFile,
+            config,
             'node_modules/fuel-soap**/**/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/subscribe-handler.zip'))
