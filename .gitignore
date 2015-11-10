@@ -3,3 +3,4 @@ dist/
 email-signup-config.js
 .idea/
 typings/
+*.js.map
