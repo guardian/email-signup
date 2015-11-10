@@ -15,7 +15,7 @@ var lambdaOptions = {
 
 //Cleaning
 gulp.task('clean', function () {
-    return gulp.src('dist/', {read: false})
+    return gulp.src(['dist/', 'built/'], {read: false})
         .pipe(clean());
 });
 
