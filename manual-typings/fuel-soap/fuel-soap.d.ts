@@ -45,7 +45,7 @@ declare class FuelSoap {
     create(soapType:string,
            triggeredSend:TriggeredSend,
            createOption:any,
-           callback:(error:any, response:any) => any);
+           callback:(error:any, response:any) => any): any;
 }
 
 declare module 'fuel-soap' {
