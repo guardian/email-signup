@@ -4,6 +4,7 @@
 import FuelSoap = require('fuel-soap');
 import * as Promise from 'bluebird';
 import * as Config from 'email-signup-config';
+import * as Monapt from 'monapt';
 
 //Local Interface
 interface EmailData {
@@ -66,27 +67,32 @@ const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailDat
 };
 
 export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): void => {
-    const emailData: Array<EmailData> = extractDataFromKinesisEvent(kinesisEvent);
+    Monapt.Try(() => {
+        const emailData: Array<EmailData> = extractDataFromKinesisEvent(kinesisEvent);
 
-    emailData.forEach((emailData: EmailData) => {
-        const triggeredSend: TriggeredSend = createTriggeredSend(emailData);
-        sendTriggeredSend(triggeredSend)
-            .then((response: any) => {
-                console.log("Response body: " + JSON.stringify(response.body));
+        emailData.forEach((emailData: EmailData) => {
+            const triggeredSend: TriggeredSend = createTriggeredSend(emailData);
+            sendTriggeredSend(triggeredSend)
+                .then((response: any) => {
+                    console.log("Response body: " + JSON.stringify(response.body));
 
-                var result = response.body.Results[0] || {StatusCode: "Error", StatusMessage: "There were no results"};
+                    var result = response.body.Results[0] || {StatusCode: "Error", StatusMessage: "There were no results"};
 
-                if (result.StatusCode === 'OK') {
-                    console.log("Successfully subscribed " + emailData.email + " to " + emailData.listId);
-                    context.succeed("Successfully subscribed " + emailData.email + " to " + emailData.listId);
-                } else {
-                    console.log("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
-                    context.fail("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
-                }
-            })
-            .catch((error: any) => {
-                console.log('Error in callback: ' + JSON.stringify(error));
-                context.fail(error);
-            });
+                    if (result.StatusCode === 'OK') {
+                        console.log("Successfully subscribed " + emailData.email + " to " + emailData.listId);
+                        context.succeed("Successfully subscribed " + emailData.email + " to " + emailData.listId);
+                    } else {
+                        console.log("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
+                        context.fail("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
+                    }
+                })
+                .catch((error: any) => {
+                    console.log('Error in callback: ' + JSON.stringify(error));
+                    context.fail(error);
+                });
+        });
+    }).recover((error: Error) => {
+        context.log("Lambda method failed! StatusCode: " + JSON.stringify(error));
+        context.fail("Failed! StatusCode: " + JSON.stringify(error));
     });
 };
