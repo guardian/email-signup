@@ -25,6 +25,7 @@ const createOption: CreateOption = {
 };
 
 const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
+    const triggeredSendKey: string = emailData.triggeredSendKey && emailData.triggeredSendKey.toString(); 
     const subscriberEmailGroup: ExtraAttribute = {
         Name: 'Email group',
         Value: emailData.emailGroup
@@ -38,7 +39,7 @@ const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
 
     return {
         TriggeredSendDefinition: {
-            CustomerKey: emailData.triggeredSendKey.toString()
+            CustomerKey: triggeredSendKey
         },
         Subscribers: [subscriber]
     };
