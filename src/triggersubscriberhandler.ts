@@ -11,7 +11,7 @@ interface EmailData {
     email: string,
     listId: string,
     emailGroup: string,
-    triggeredSendKey: number
+    triggeredSendKey: string
 }
 
 const SoapClient: FuelSoap = new FuelSoap(Config.fuelSoapCredentials);
@@ -26,7 +26,6 @@ const createOption: CreateOption = {
 };
 
 const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
-    const triggeredSendKey: string = emailData.triggeredSendKey && emailData.triggeredSendKey.toString(); 
     const subscriberEmailGroup: ExtraAttribute = {
         Name: 'Email group',
         Value: emailData.emailGroup
@@ -40,7 +39,7 @@ const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
 
     return {
         TriggeredSendDefinition: {
-            CustomerKey: triggeredSendKey
+            CustomerKey: emailData.triggeredSendKey
         },
         Subscribers: [subscriber]
     };
