@@ -3,7 +3,7 @@ var AWS = require('aws-sdk');
 var CONFIG = require('email-signup-config');
 
 var PARTITION_KEY = 'email';
-var STREAM_NAME = CONFIG.Streams.ingestionStream;
+var STREAM_NAME = CONFIG.CODE.Streams.ingestionStream;
 var KINESIS = new AWS.Kinesis();
 
 AWS.config.region = 'eu-west-1';
