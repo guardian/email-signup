@@ -60,6 +60,7 @@ gulp.task('buildSubscribeHandler', ['typescript'], function() {
             'built/triggersubscriberhandler.js',
             'node_modules/email-signup-config.js',
             'node_modules/fuel-soap**/**/*',
+            'node_modules/monapt**/**/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/subscribe-handler.zip'))
         .pipe(gulp.dest('.'));
