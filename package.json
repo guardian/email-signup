@@ -26,6 +26,7 @@
   "dependencies": {
     "fuel-soap": "^1.2.0",
     "grunt-aws-lambda": "0.10.0",
+    "monapt": "^0.5.0",
     "validator": "4.2.0"
   },
   "bundledDependencies": [
