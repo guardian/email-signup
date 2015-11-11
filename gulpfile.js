@@ -25,7 +25,7 @@ gulp.task('buildEmailIngestHandler', function() {
     var Config = require('./node_modules/email-signup-config');
     return gulp.src([
             'node_modules/email-signup-config.js',
-            'emailingest.js',
+            'src/emailingest.js',
             'node_modules/validator/*'])
         .pipe(zip('dist/email-ingest-handler.zip'))
         .pipe(gulp.dest('.'));
@@ -42,7 +42,7 @@ gulp.task('uploadEmailIngestHandler', function() {
 gulp.task('updateEmailIngestHandler', function() {
     var Config = require('./node_modules/email-signup-config');
     var emailIngestHandlerConfig = {
-        FunctionName: Config.Lambda.emailIngestHandlerName
+        FunctionName: Config.CODE.Lambda.emailIngestHandlerName
     };
 
     return gulp.src('dist/email-ingest-handler.zip')
@@ -54,7 +54,7 @@ gulp.task('emailIngest', function(cb) {
 });
 
 //Email Subscribe
-gulp.task('buildSubscribeHandler', function() {
+gulp.task('buildSubscribeHandler', ['typescript'], function() {
     var Config = require('./node_modules/email-signup-config');
     return gulp.src([
             'built/triggersubscriberhandler.js',
