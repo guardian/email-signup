@@ -6,7 +6,7 @@ interface ExtraAttribute {
 }
 
 interface ListSubscriber {
-    ID: number;
+    ID: string;
     Status: string;
 }
 
@@ -43,7 +43,7 @@ declare class FuelSoap {
     constructor(config: FuelSoapCredentials);
 
     create(soapType:string,
-           triggeredSend:TriggeredSend,
+           sendType: TriggeredSend|Subscriber,
            createOption:any,
            callback:(error:any, response:any) => any): any;
 }
