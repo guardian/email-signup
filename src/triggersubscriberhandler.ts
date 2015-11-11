@@ -67,32 +67,31 @@ const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailDat
 };
 
 export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): void => {
-    Monapt.Try(() => {
-        const emailData: Array<EmailData> = extractDataFromKinesisEvent(kinesisEvent);
-
-        emailData.forEach((emailData: EmailData) => {
-            const triggeredSend: TriggeredSend = createTriggeredSend(emailData);
-            sendTriggeredSend(triggeredSend)
-                .then((response: any) => {
+    Promise.resolve(kinesisEvent)
+        .then(extractDataFromKinesisEvent)
+        .then((emailData: Array<EmailData>) => {
+            return Promise.all(emailData.map((emailData:EmailData) => {
+                const triggeredSend: TriggeredSend = createTriggeredSend(emailData);
+                return sendTriggeredSend(triggeredSend);
+            }))
+            .then((responses: Array<any>) => {
+                return responses.map(response => {
                     console.log("Response body: " + JSON.stringify(response.body));
 
                     var result = response.body.Results[0] || {StatusCode: "Error", StatusMessage: "There were no results"};
 
-                    if (result.StatusCode === 'OK') {
-                        console.log("Successfully subscribed " + emailData.email + " to " + emailData.listId);
-                        context.succeed("Successfully subscribed " + emailData.email + " to " + emailData.listId);
-                    } else {
-                        console.log("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
-                        context.fail("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
+                    if (result.StatusCode !== 'OK') {
+                        throw "Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage;
                     }
-                })
-                .catch((error: any) => {
-                    console.log('Error in callback: ' + JSON.stringify(error));
-                    context.fail(error);
+
+                    return result;
                 });
-        });
-    }).recover((error: Error) => {
-        context.log("Lambda method failed! StatusCode: " + JSON.stringify(error));
-        context.fail("Failed! StatusCode: " + JSON.stringify(error));
-    });
+            })
+            .then(_ => {
+                const emails = emailData.map(email => email.email).join(', ');
+                const listIds = emailData.map(email => email.listId).join(', ');
+                context.succeed("Successfully subscribed " + emails + " to " + listIds);
+            })
+        }).catch(context.fail);
+
 };
