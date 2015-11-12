@@ -26,7 +26,8 @@ gulp.task('buildEmailIngestHandler', function() {
     return gulp.src([
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
-            'node_modules/validator/*'])
+            'node_modules/validator/*',
+            'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/email-ingest-handler.zip'))
         .pipe(gulp.dest('.'));
 });
