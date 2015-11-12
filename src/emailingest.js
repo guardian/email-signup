@@ -13,6 +13,8 @@ function validate(event) {
   return new Promise(function(resolve, reject) {
     if (!event.email)                    return reject("No email address");
     if (!event.listId)                   return reject("No listId");
+    if (!event.emailGroup)               return reject("No emailGroup");
+    if (!event.triggeredSendKey)         return reject("No triggeredSendKey");
     if (!Validator.isEmail(event.email)) return reject("Invalid email address");
 
     resolve(event);
@@ -20,10 +22,10 @@ function validate(event) {
 }
 
 function makePutRequest(event) {
-  return {
-    Data: '{"email": "' + event.email + '", "listId": ' + event.listId + '}',
-    PartitionKey: partitionKey,
-    StreamName: streamName
+    return {
+        Data: JSON.stringify({email: event.email, listId: event.listId, emailGroup: event.emailGroup, triggeredSendKey: event.triggeredSendKey}),
+        PartitionKey: partitionKey,
+        StreamName: streamName
   };
 }
 
@@ -32,7 +34,14 @@ exports.handler = function(event, context) {
 
     validate(event)
       .then(makePutRequest)
-      .then(Promise.promisify(Kinesis.putRecord))
+      .then(function (record) {
+          return new Promise(function(resolve, reject) {
+              Kinesis.putRecord(record, function (error, data) {
+                  if (error) return reject(error);
+                  console.log("Successfully put to Kinesis with SequenceNumber of " + data.SequenceNumber);
+                  return resolve(data);
+              });
+          })})
       .then(function() { context.succeed("Success: Ingested Email") })
       .catch(function(e) { context.fail(e) });
 };
