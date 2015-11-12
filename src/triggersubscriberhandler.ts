@@ -118,20 +118,30 @@ export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Pr
                 const subscriptions: Promise<Array<any>> = Promise.map(emailDataList, createSubscription).map(subscribeEmailToList);
 
                 return Promise.join(triggers, subscriptions)
-                    .map((response: any) => {
-                        if (!response.body.Results[0]) throw "No results";
-                        return response.body.Results;
+                    .map((responses: Array<any>) => {
+                        return responses.map((response: any) => {
+                            if (!response.body.Results[0]) throw "No results";
+                            return response.body.Results;
+                        });
                     })
-                    .map((result: any) => {
-                        if (result.StatusCode !== 'OK') throw result;
-                        return result;
+                    .map((allResponses: Array<Array<any>>) => {
+                        allResponses.map((results: Array<any>) => {
+                            results.map((result: any) => {
+                                console.log(JSON.stringify(result));
+                                if (result.StatusCode !== 'OK') {
+                                    console.log("Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage);
+                                    throw result;
+                                }
+                                return result;
+                            });
+                        });
                     })
                     .then(() => Promise.resolve(emailDataList));
             })
             .then(list => {
-                console.log("FINISHED APPARENTLY");
-                console.log(list);
-                context.succeed(kinesisEvent);
+                console.log("Successfully subscribed user(s) to lists.");
+                console.log(JSON.stringify(list));
+                context.succeed("Success: Successfully Subscribed Users");
             })
             .catch(() => context.succeed("Didn't work"));
 };
