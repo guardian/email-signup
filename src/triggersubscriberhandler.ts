@@ -81,13 +81,11 @@ const sendTriggeredSend = (triggeredSend: TriggeredSend): Promise<any> => {
             createOption,
             function (err:any, res:any) {
                 console.log("TriggeredSend Callback");
-                console.log(err);
-                console.log(res);
                 if (err) return reject(err);
                 resolve(res);
             });
     });
-}
+};
 
 const subscribeEmailToList = (subscriber: Subscriber): Promise<any> => {
     return new Promise(function (resolve, reject) {
@@ -97,13 +95,11 @@ const subscribeEmailToList = (subscriber: Subscriber): Promise<any> => {
             createOption,
             function (err, res) {
                 console.log("Subscriber Callback");
-                console.log(err);
-                console.log(res);
                 if (err) return reject(err);
                 resolve(res);
             });
     });
-}
+};
 
 const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailData> => {
     return kinesisEvent.Records.map((record: KinesisRecord) => {
