@@ -1,38 +1,38 @@
-var VALIDATOR = require('validator');
+var Config = require('email-signup-config');
+var Promise  = require('bluebird');
+var Validator = require('validator');
 var AWS = require('aws-sdk');
-var CONFIG = require('email-signup-config');
 
-var PARTITION_KEY = 'email';
-var STREAM_NAME = CONFIG.CODE.Streams.ingestionStream;
-var KINESIS = new AWS.Kinesis();
+var partitionKey = 'email';
+var streamName = Config.CODE.Streams.ingestionStream;
+var Kinesis = new AWS.Kinesis();
 
 AWS.config.region = 'eu-west-1';
 
-function makePutRequest(email, listId) {
+function validate(event) {
+  return new Promise(function(resolve, reject) {
+    if (!event.email)                    return reject("No email address");
+    if (!event.listId)                   return reject("No listId");
+    if (!Validator.isEmail(event.email)) return reject("Invalid email address");
+
+    resolve(event);
+  });
+}
+
+function makePutRequest(event) {
   return {
-    Data: '{"email": "' + email + '", "listId": ' + listId + '}',
-    PartitionKey: PARTITION_KEY,
-    StreamName: STREAM_NAME
+    Data: '{"email": "' + event.email + '", "listId": ' + event.listId + '}',
+    PartitionKey: partitionKey,
+    StreamName: streamName
   };
 }
 
 exports.handler = function(event, context) {
     console.log('Received event:', JSON.stringify(event));
 
-    if (event.email && event.listId && VALIDATOR.isEmail(event.email)) {
-        var putRequest = makePutRequest(event.email, event.listId);
-
-        KINESIS.putRecord(putRequest, function(err, data) {
-          if (err) {
-            console.log(err, err.stack);
-            context.fail(new Error('Error'));
-          }
-          else {
-            console.log("Successfully put to Kinesis with SequenceNumber of " + data.SequenceNumber);
-            context.succeed("Success: Ingested Email");
-          }
-        });
-    } else {
-        context.fail(new Error('Failure: email or listId is not defined'));
-    }
+    validate(event)
+      .then(makePutRequest)
+      .then(Promise.promisify(Kinesis.putRecord))
+      .then(function() { context.succeed("Success: Ingested Email") })
+      .catch(function(e) { context.fail(e) });
 };
