@@ -65,43 +65,37 @@ const createSubscription = (emailData: EmailData): Subscriber => {
     };
 };
 
-const sendTriggeredSend = (triggeredSend: TriggeredSend): Promise<any> =>  {
+const sendTriggeredSend = (triggeredSend: TriggeredSend): Promise<any> => {
     return new Promise(function (resolve, reject) {
-        try {
-            SoapClient.create(
-                'TriggeredSend',
-                triggeredSend,
-                createOption,
-                function (err: any, res: any) {
-                    console.log("TriggeredSend Callback");
-                    console.log(err);
-                    console.log(res);
-                    if (err) return reject(err);
-                    resolve(res);
-                }
-            );
-        } catch(error) { reject(error); }
+        SoapClient.create(
+            'TriggeredSend',
+            triggeredSend,
+            createOption,
+            function (err:any, res:any) {
+                console.log("TriggeredSend Callback");
+                console.log(err);
+                console.log(res);
+                if (err) return reject(err);
+                resolve(res);
+            });
     });
-};
+}
 
 const subscribeEmailToList = (subscriber: Subscriber): Promise<any> => {
     return new Promise(function (resolve, reject) {
-        try {
-            SoapClient.create(
-                'Subscriber',
-                subscriber,
-                createOption,
-                function (err, res) {
-                    console.log("Subscriber Callback");
-                    console.log(err);
-                    console.log(res);
-                    if (err) return reject(err);
-                    resolve(res);
-                }
-            );
-        } catch(error){ reject(error); }
+        SoapClient.create(
+            'Subscriber',
+            subscriber,
+            createOption,
+            function (err, res) {
+                console.log("Subscriber Callback");
+                console.log(err);
+                console.log(res);
+                if (err) return reject(err);
+                resolve(res);
+            });
     });
-};
+}
 
 const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailData> => {
     return kinesisEvent.Records.map((record: KinesisRecord) => {
@@ -113,69 +107,27 @@ const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailDat
 };
 
 export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Promise<any> => {
-        process.on('uncaughtException', (error: any) => {
-            console.log("IN uncaughtException");
-            console.log(error);
-        });
-        process.on('unhandledRejection', (error: any) => {
-            console.log("IN unhandledRejection");
-            console.log(error);
-        });
-
         return Promise.resolve(kinesisEvent)
             .then(extractDataFromKinesisEvent)
             .then((emailDataList: Array<EmailData>) => {
-                console.log("THEN 2");
+                const triggers: Promise<Array<any>> = Promise.map(emailDataList, createTriggeredSend).map(sendTriggeredSend);
+                const subscriptions: Promise<Array<any>> = Promise.map(emailDataList, createSubscription).map(subscribeEmailToList);
 
-                const promiseTriggeredSend = Promise.all(emailDataList.map((emailData: EmailData) => {
-                        console.log("BEFORE THEN promiseTriggeredSend");
-                        const triggeredSend: TriggeredSend = createTriggeredSend(emailData);
-                        console.log("I MADE THE TRIGGEREDSEND: " + JSON.stringify(triggeredSend));
-                        return sendTriggeredSend(triggeredSend);
-                    }))
-                    .then((responses: Array<any>) => {
-                        console.log("THEN OF promiseTriggeredSend");
-                        return responses.map(response => {
-                            console.log("Response body: " + JSON.stringify(response.body));
-
-                            var result = response.body.Results[0] || {StatusCode: "Error", StatusMessage: "There were no results"};
-
-                            if (result.StatusCode !== 'OK') {
-                                throw "Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage;
-                            }
-
-                            return result;
-                        });
-                    });
-
-                const promiseSubscribeToList: Promise<any> = Promise.all(emailDataList.map((emailData: EmailData) => {
-                        console.log("BEFORE THEN promiseSubscribeToList");
-                        const listSubscriber: Subscriber = createSubscription(emailData);
-                        console.log("I MADE THE SUBSCRIBER: " + JSON.stringify(listSubscriber));
-                        return subscribeEmailToList(listSubscriber)
-                    }))
-                    .then((responses: Array<any>) => {
-                        console.log("THEN OF promiseSubscribeToList");
-                        return responses.map(response => {
-                            console.log("Response body: " + JSON.stringify(response.body));
-
-                            var result = response.body.Results[0] || {StatusCode: "Error", StatusMessage: "There were no results"};
-
-                            if (result.StatusCode !== 'OK') {
-                                throw "Failed! StatusCode: " + result.StatusCode + " StatusMessage: " + result.StatusMessage;
-                            }
-
-                            return result;
-                        });
-                    });
-
-                console.log("I AM ABOUT TO RETURN");
-                return Promise.join(promiseTriggeredSend, promiseSubscribeToList)
-                    .then(_ => {
-                        console.log("FINISHED APPARENTLY");
-                        const emails = emailDataList.map(email => email.email).join(', ');
-                        const listIds = emailDataList.map(email => email.listId).join(', ');
-                        context.succeed("Successfully subscribed " + emails + " to " + listIds);
-                    });
-            }).catch(context.succeed("DOESN'T WORK"));
+                return Promise.join(triggers, subscriptions)
+                    .map((response: any) => {
+                        if (!response.body.Results[0]) throw "No results";
+                        return response.body.Results;
+                    })
+                    .map((result: any) => {
+                        if (result.StatusCode !== 'OK') throw result;
+                        return result;
+                    })
+                    .then(() => Promise.resolve(emailDataList));
+            })
+            .then(list => {
+                console.log("FINISHED APPARENTLY");
+                console.log(list);
+                context.succeed(kinesisEvent);
+            })
+            .catch(() => context.succeed("Didn't work"));
 };
