@@ -41,12 +41,16 @@ const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
         Attributes: [ subscriberEmailGroup ]
     };
 
-    return {
+    const triggeredSend = {
         TriggeredSendDefinition: {
             CustomerKey: triggeredSendKey
         },
         Subscribers: [subscriber]
     };
+
+    console.log("Created TriggeredSend: " + JSON.stringify(triggeredSend));
+
+    return triggeredSend;
 };
 
 const createSubscription = (emailData: EmailData): Subscriber => {
@@ -58,11 +62,15 @@ const createSubscription = (emailData: EmailData): Subscriber => {
         Status: 'Active'
     };
 
-    return {
+    const subscription = {
         EmailAddress: email,
         SubscriberKey: email,
         Lists: [ listSubscriber ]
     };
+
+    console.log("Created Subscription: " + JSON.stringify(subscription));
+
+    return subscription;
 };
 
 const sendTriggeredSend = (triggeredSend: TriggeredSend): Promise<any> => {
