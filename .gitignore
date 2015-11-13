@@ -1,7 +1,7 @@
 node_modules/
 dist/
-email-signup-config.js
 .idea/
 typings/
 *.js.map
 built/
+email-signup-config*.js
