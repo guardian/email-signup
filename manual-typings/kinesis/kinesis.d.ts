@@ -20,6 +20,12 @@ interface KinesisEvent {
     Records: Array<KinesisRecord>
 }
 
+interface KinesisRequest {
+    Data: string,
+    PartitionKey: string,
+    StreamName: string
+}
+
 declare module 'kinesis' {
     export default KinesisEvent;
 }

@@ -5,6 +5,9 @@ import FuelSoap = require('fuel-soap');
 import * as Promise from 'bluebird';
 import * as Config from 'email-signup-config';
 import * as Monapt from 'monapt';
+import * as AWS from 'aws-sdk';
+
+var Kinesis = new AWS.Kinesis();
 
 //Local Interface
 interface EmailData {
@@ -13,6 +16,9 @@ interface EmailData {
     emailGroup: string,
     triggeredSendKey: string
 }
+
+const partitionKey = 'exactTarget';
+const exactTargetStatusStream = Config.Streams.exactTargetStatusStream;
 
 const SoapClient: FuelSoap = new FuelSoap(Config.fuelSoapCredentials);
 
@@ -110,6 +116,30 @@ const extractDataFromKinesisEvent = (kinesisEvent: KinesisEvent): Array<EmailDat
     });
 };
 
+const makePutRequest = (data: any): KinesisRequest => {
+    return {
+        Data: JSON.stringify(data),
+        PartitionKey: partitionKey,
+        StreamName: exactTargetStatusStream
+    };
+};
+
+const makeSuccessPutRequest = (emailData: Array<EmailData>): KinesisRequest =>
+    makePutRequest({status: "success", data: emailData});
+
+const makeFailurePutRequest = (emailData: Array<EmailData>, error: Error): KinesisRequest =>
+    makePutRequest({status: "failure", error: error, data: emailData});
+
+const putStatusToStream = (kinesisRequest: KinesisRequest): Promise<any> => {
+    return new Promise(function(resolve, reject) {
+        Kinesis.putRecord(kinesisRequest, function (error: any, data: any) {
+            if (error) return reject(error);
+            console.log("Successfully put to ExactTargetStatus stream with SequenceNumber of " + data.SequenceNumber);
+            return resolve(data);
+        });
+    })
+};
+
 export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Promise<any> => {
         return Promise.resolve(kinesisEvent)
             .then(extractDataFromKinesisEvent)
@@ -136,6 +166,11 @@ export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Pr
                             });
                         });
                     })
+                    .then(() => putStatusToStream(makeSuccessPutRequest(emailDataList)))
+                    .catch((error) => {
+                        console.log(error);
+                        putStatusToStream(makeFailurePutRequest(emailDataList, error))
+                    })
                     .then(() => Promise.resolve(emailDataList));
             })
             .then(list => {
@@ -143,5 +178,8 @@ export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Pr
                 console.log(JSON.stringify(list));
                 context.succeed("Success: Successfully Subscribed Users");
             })
-            .catch(() => context.succeed("Didn't work"));
+            .catch((error) => {
+                console.log(error);
+                context.succeed("Didn't work")
+            });
 };

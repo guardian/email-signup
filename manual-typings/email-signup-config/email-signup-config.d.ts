@@ -26,6 +26,6 @@ declare class Lambda {
 
 declare module 'email-signup-config' {
     export var fuelSoapCredentials: FuelSoapCredentials;
-    export var streams: Streams;
-    export var lambda: Lambda;
+    export var Streams: Streams;
+    export var Lambda: Lambda;
 }
