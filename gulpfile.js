@@ -10,9 +10,12 @@ var runSequence = require('gulp-run-sequence');
 var clean = require('gulp-clean');
 var ts = require('gulp-typescript');
 var rename = require('gulp-rename');
+var kinesis = require('kinesis');
+
+var region = 'eu-west-1';
 
 var lambdaOptions = {
-    region: 'eu-west-1'
+    region: region
 };
 
 var env = (function() {
@@ -128,4 +131,27 @@ gulp.task('typescript', function () {
             module: 'commonjs'
         }))
         .pipe(gulp.dest('built'));
+});
+
+//Kinesis Listeners
+function kinesisPrinter(streamName) {
+    function extractDataFromKinesisEvent(event) {
+        return event.Data.toString("utf-8");
+    }
+
+    function dataPrinter(event) {
+        console.log(extractDataFromKinesisEvent(event));
+    }
+
+    var kinesisSource = kinesis.stream({region: region, name: streamName, oldest: false});
+    kinesisSource.on('data', dataPrinter);
+    return kinesisSource;
+}
+
+gulp.task('listenEmailIngest', function() {
+    return kinesisPrinter(getConfig().Streams.ingestionStream);
+});
+
+gulp.task('listenExactTarget', function() {
+    return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
