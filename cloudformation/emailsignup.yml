@@ -48,7 +48,7 @@ Resources:
       Description: >
         Ingestion stream handler, this puts into ExactTarget and puts success
         failure onto a different stream.
-      Handler: subscribehandler.handler
+      Handler: triggersubscriberhandler.handleKinesisEvent
       Runtime: nodejs
       Role:
         Ref: LambdaRole
