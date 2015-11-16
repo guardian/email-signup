@@ -4,7 +4,7 @@ var Validator = require('validator');
 var AWS = require('aws-sdk');
 
 var partitionKey = 'email';
-var streamName = Config.CODE.Streams.ingestionStream;
+var streamName = Config.Streams.ingestionStream;
 var Kinesis = new AWS.Kinesis();
 
 AWS.config.region = 'eu-west-1';
