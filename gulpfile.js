@@ -38,9 +38,9 @@ gulp.task('clean', function () {
 });
 
 gulp.task('writeConfig', function() {
-    return gulp.src(envConfig)
+    return gulp.src('./node_modules/' + envConfig)
         .pipe(rename(config))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest('./node_modules'));
 });
 
 //Email Ingestion
