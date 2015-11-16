@@ -149,9 +149,13 @@ function kinesisPrinter(streamName) {
 }
 
 gulp.task('listenEmailIngest', function() {
+    var streamName = getConfig().Streams.ingestionStream;
+    console.log("Listening to " + streamName);
     return kinesisPrinter(getConfig().Streams.ingestionStream);
 });
 
 gulp.task('listenExactTarget', function() {
+    var streamName = getConfig().Streams.exactTargetStatusStream;
+    console.log("Listening to " + streamName);
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
