@@ -159,3 +159,6 @@ gulp.task('listenExactTarget', function() {
     console.log("Listening to " + streamName);
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
+
+gulp.task('test', function() {
+});
