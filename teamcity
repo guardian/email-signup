@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o xtrace
+set -o nounset
+set -o errexit
+
+npm prune
+npm install
+npm install -g gulp
+
+npm test
