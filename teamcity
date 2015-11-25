@@ -8,4 +8,4 @@ npm prune
 npm install
 npm install -g gulp
 
-npm test
+gulp test
