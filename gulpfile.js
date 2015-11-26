@@ -51,7 +51,7 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'src/emailingest.js',
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip('dist/email-ingest-handler.zip'))
+        .pipe(zip('dist/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
@@ -84,7 +84,7 @@ gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
             'node_modules/fuel-soap**/**/*',
             'node_modules/monapt**/**/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip('dist/subscribe-handler.zip'))
+        .pipe(zip('dist/subscribe-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
