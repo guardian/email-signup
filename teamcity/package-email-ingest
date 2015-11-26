@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o xtrace
+set -o nounset
+set -o errexit
+set -x
+
+[ -d dist ] && rm -R dist
+
+gulp buildEmailIngestHandler
+gulp buildEmailIngestHandler --prod
+
+zip --junk-paths ./dist/artifact.zip dist/email-ingest-handler-*.zip deploy.json
+
+
+
+
+
+
+
