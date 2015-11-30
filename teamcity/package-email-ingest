@@ -10,11 +10,8 @@ set -x
 gulp buildEmailIngestHandler
 gulp buildEmailIngestHandler --prod
 
-[ ! -d target ] && mkdir target
+cp deploy/deploy-email-ingest.json ./dist/deploy.json
 
-cp deploy/deploy-email-ingest.json ./target/deploy.json
+zip --junk-paths ./dist/artifact.zip dist/email-ingest-handler-*.zip dist/deploy.json
 
-zip --junk-paths ./dist/artifact.zip dist/email-ingest-handler-*.zip target/deploy.json
-
-rm target/deploy.json
 
