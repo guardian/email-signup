@@ -14,7 +14,9 @@ interface EmailData {
     email: string,
     listId: string,
     emailGroup: string,
-    triggeredSendKey: string
+    triggeredSendKey: string,
+    referrer?: string,
+    campaignCode?: string
 }
 
 const partitionKey = 'exactTarget';
