@@ -22,8 +22,20 @@ function validate(event) {
 }
 
 function makePutRequest(event) {
+    var data = {
+        email: event.email,
+        listId: event.listId,
+        emailGroup: event.emailGroup,
+        triggeredSendKey: event.triggeredSendKey};
+
+    if (event.referrer) {
+        data.referrer = event.referrer;}
+
+    if (event.campaignCode) {
+        data.campaignCode = event.campaignCode;}
+
     return {
-        Data: JSON.stringify({email: event.email, listId: event.listId, emailGroup: event.emailGroup, triggeredSendKey: event.triggeredSendKey}),
+        Data: JSON.stringify(data),
         PartitionKey: partitionKey,
         StreamName: streamName
   };
