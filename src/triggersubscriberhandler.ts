@@ -36,6 +36,8 @@ const createOption: CreateOption = {
 const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
     const email = emailData.email || '';
     const emailGroup = emailData.emailGroup || '';
+    const referrer = emailData.referrer || '';
+    const campaignCode = emailData.campaignCode || '';
     const triggeredSendKey = emailData.triggeredSendKey || '';
 
     const subscriberEmailGroup: ExtraAttribute = {
@@ -43,10 +45,20 @@ const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
         Value: emailGroup
     };
 
+    const referrerAttribute: ExtraAttribute = {
+        Name: 'Referrer',
+        Value: referrer
+    };
+
+    const campaignCodeAttribute: ExtraAttribute = {
+        Name: 'CampaignCode',
+        Value: campaignCode
+    };
+
     const subscriber: Subscriber = {
         EmailAddress: email,
         SubscriberKey: email,
-        Attributes: [ subscriberEmailGroup ]
+        Attributes: [ subscriberEmailGroup, referrerAttribute, campaignCodeAttribute ]
     };
 
     const triggeredSend = {
