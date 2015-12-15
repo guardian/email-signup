@@ -92,7 +92,8 @@ gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
 });
 
 gulp.task('uploadSubscribeHandler', function() {
-    return fs.src('dist/subscribe-handler.zip')
+    var subscribeHandler = 'subscribe-handler-' + env +'.zip';
+    return fs.src('dist/' + subscribeHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -105,7 +106,9 @@ gulp.task('updateSubscribeHandler', function() {
         Timeout: 15
     };
 
-    return gulp.src('dist/subscribe-handler.zip')
+    var subscribeHandler = 'subscribe-handler-' + env +'.zip';
+
+    return gulp.src('dist/' + subscribeHandler)
         .pipe(lambda(subscribeHandlerConfig, lambdaOptions))
 });
 
