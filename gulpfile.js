@@ -56,7 +56,8 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
-    return fs.src('dist/email-ingest-handler.zip')
+    var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
+    return fs.src('dist/' + emailIngestHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -68,7 +69,9 @@ gulp.task('updateEmailIngestHandler', function() {
         FunctionName: getConfig().Lambda.emailIngestHandlerName
     };
 
-    return gulp.src('dist/email-ingest-handler.zip')
+    var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
+
+    return gulp.src('dist/' + emailIngestHandler)
         .pipe(lambda(emailIngestHandlerConfig, lambdaOptions))
 });
 
