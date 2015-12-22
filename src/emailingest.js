@@ -14,7 +14,6 @@ function validate(event) {
     if (!event.email)                    return reject("No email address");
     if (!event.listId)                   return reject("No listId");
     if (!event.emailGroup)               return reject("No emailGroup");
-    if (!event.triggeredSendKey)         return reject("No triggeredSendKey");
     if (!Validator.isEmail(event.email)) return reject("Invalid email address");
 
     resolve(event);
@@ -27,6 +26,9 @@ function makePutRequest(event) {
         listId: event.listId,
         emailGroup: event.emailGroup,
         triggeredSendKey: event.triggeredSendKey};
+
+    if (event.triggeredSendKey) {
+        data.triggeredSendKey = event.triggeredSendKey;}
 
     if (event.referrer) {
         data.referrer = event.referrer;}
