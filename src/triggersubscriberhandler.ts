@@ -14,7 +14,7 @@ interface EmailData {
     email: string,
     listId: string,
     emailGroup: string,
-    triggeredSendKey: string,
+    triggeredSendKey?: string,
     referrer?: string,
     campaignCode?: string
 }
@@ -158,7 +158,11 @@ export const handleKinesisEvent = (kinesisEvent: KinesisEvent, context: any): Pr
         return Promise.resolve(kinesisEvent)
             .then(extractDataFromKinesisEvent)
             .then((emailDataList: Array<EmailData>) => {
-                const triggers: Promise<Array<any>> = Promise.map(emailDataList, createTriggeredSend).map(sendTriggeredSend);
+
+                const emailDataListWithTriggers: Array<EmailData> =
+                    emailDataList.filter((emailData) => emailData.triggeredSendKey !== undefined);
+
+                const triggers: Promise<Array<any>> = Promise.map(emailDataListWithTriggers, createTriggeredSend).map(sendTriggeredSend);
                 const subscriptions: Promise<Array<any>> = Promise.map(emailDataList, createSubscription).map(subscribeEmailToList);
 
                 return Promise.join(triggers, subscriptions)
