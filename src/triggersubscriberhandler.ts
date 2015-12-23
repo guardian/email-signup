@@ -35,30 +35,11 @@ const createOption: CreateOption = {
 
 const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
     const email = emailData.email || '';
-    const emailGroup = emailData.emailGroup || '';
-    const referrer = emailData.referrer || '';
-    const campaignCode = emailData.campaignCode || '';
     const triggeredSendKey = emailData.triggeredSendKey || '';
-
-    const subscriberEmailGroup: ExtraAttribute = {
-        Name: 'Email group',
-        Value: emailGroup
-    };
-
-    const referrerAttribute: ExtraAttribute = {
-        Name: 'Referrer',
-        Value: referrer
-    };
-
-    const campaignCodeAttribute: ExtraAttribute = {
-        Name: 'CampaignCode',
-        Value: campaignCode
-    };
 
     const subscriber: Subscriber = {
         EmailAddress: email,
-        SubscriberKey: email,
-        Attributes: [ subscriberEmailGroup, referrerAttribute, campaignCodeAttribute ]
+        SubscriberKey: email
     };
 
     const triggeredSend = {
@@ -77,15 +58,37 @@ const createSubscription = (emailData: EmailData): Subscriber => {
     const email = emailData.email || '';
     const listId = emailData.listId || '';
 
+    const emailGroup = emailData.emailGroup;
+    const referrer = emailData.referrer;
+    const campaignCode = emailData.campaignCode;
+
     const listSubscriber: ListSubscriber = {
         ID: listId,
         Status: 'Active'
     };
 
+    const attributes: Array<ExtraAttribute> = [];
+
+    if (emailGroup) {
+        attributes.push({
+            Name: 'Email group',
+            Value: emailGroup});}
+
+    if (referrer) {
+        attributes.push({
+            Name: 'Referrer',
+            Value: referrer});}
+
+    if (campaignCode) {
+        attributes.push({
+            Name: 'CampaignCode',
+            Value: campaignCode});}
+
     const subscription = {
         EmailAddress: email,
         SubscriberKey: email,
-        Lists: [ listSubscriber ]
+        Lists: [ listSubscriber ],
+        Attributes: attributes
     };
 
     console.log("Created Subscription: " + JSON.stringify(subscription));
