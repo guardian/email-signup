@@ -11,6 +11,7 @@ var clean = require('gulp-clean');
 var ts = require('gulp-typescript');
 var rename = require('gulp-rename');
 var kinesis = require('kinesis');
+var taskListing = require('gulp-task-listing');
 
 var region = 'eu-west-1';
 
@@ -30,6 +31,11 @@ var config = 'email-signup-config.js';
 function getConfig() {
   return require(envConfig);
 }
+
+//Help
+gulp.task('help', taskListing);
+
+gulp.task('default', ['help']);
 
 //Cleaning
 gulp.task('clean', function () {
