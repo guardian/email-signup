@@ -12,6 +12,6 @@ gulp buildEmailIngestHandler --prod
 
 cp deploy/deploy-email-ingest.json ./dist/deploy.json
 
-zip --junk-paths ./dist/artifacts.zip dist/email-ingest-handler-*.zip dist/deploy.json
+zip --junk-paths -r ./dist/artifacts.zip dist/packages/ dist/deploy.json
 
 
