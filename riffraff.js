@@ -3,21 +3,14 @@ var Promise = require('bluebird');
 var fs = require('fs');
 
 
-function getBuildId(){
-    //var now = new Date();
-    //var buildId = [now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()].join('');
-    var teamCityBuildNumber = process.env.BUILD_NUMBER;
-    if (!teamCityBuildNumber){
-        throw Error('No BUILD_NUMBER set')}
-    return teamCityBuildNumber;}
-
 function s3Upload(packageName, branch, leadDir) {
 
     if (!packageName) throw Error('s3Upload requires packageName');
     if (!branch) throw Error('s3Upload requires branch');
     if (!leadDir) throw Error('s3Upload requires leadDir');
+    if (!process.env.BUILD_NUMBER) throw Error('No BUILD_NUMBER set');
 
-    var buildId = getBuildId();
+    var buildId = process.env.BUILD_NUMBER;
 
     var SETTINGS = {
         leadDir: leadDir,
