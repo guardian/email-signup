@@ -1,0 +1,31 @@
+{
+  "defaultStacks": [
+    "email-signup"
+  ],
+  "packages": {
+    "email-ingest": {
+      "type": "aws-lambda",
+      "data": {
+        "functions": {
+          "CODE": {
+            "name": "EmailSignup-CODE-EmailHandler-LP8EDN14CDKZ",
+            "filename": "email-ingest-handler-CODE.zip"
+          },
+          "PROD": {
+            "name": "EmailSignup-PROD-EmailHandler-OC7MDZRGHS6X",
+            "filename": "email-ingest-handler-PROD.zip"
+          }
+        }
+      }
+    }
+  },
+  "recipes": {
+    "default": {
+      "actions": [
+        "email-ingest.updateLambda"
+      ]
+    }
+  }
+}
+
+
