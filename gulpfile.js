@@ -180,7 +180,7 @@ gulp.task('buildEmailIngestDeployZip', function() {
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
-    var packageName = 'dotcom:email-signup-email-ingest';
+    var packageName = 'dotcom:email-signup-ingest';
     var branch = 'master';
     var leadDir = 'target/riffraff';
 
