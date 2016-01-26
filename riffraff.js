@@ -4,6 +4,8 @@ var fs = require('fs');
 
 
 function getBuildId(){
+    //var now = new Date();
+    //var buildId = [now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()].join('');
     var teamCityBuildNumber = process.env.BUILD_NUMBER;
     if (!teamCityBuildNumber){
         throw Error('No BUILD_NUMBER set')}
@@ -22,9 +24,9 @@ function s3Upload(packageName, branch, leadDir) {
         packageName: packageName,
         buildId: buildId,
         artifactsFilename: 'artifacts.zip',
-        artifactBucket: 'riffraff-test-artifact',
+        artifactBucket: 'riffraff-artifact',
         manifestFile: 'build.json',
-        manifestBucket: 'riffraff-test-build'
+        manifestBucket: 'riffraff-builds'
     };
 
     var now = new Date();
