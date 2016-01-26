@@ -12,6 +12,7 @@ var ts = require('gulp-typescript');
 var rename = require('gulp-rename');
 var kinesis = require('kinesis');
 var taskListing = require('gulp-task-listing');
+var riffraff = require('./riffraff');
 
 var region = 'eu-west-1';
 
@@ -57,7 +58,7 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'src/emailingest.js',
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip('dist/packages/email-signup/email-ingest-handler-' + env + '.zip'))
+        .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
@@ -172,5 +173,20 @@ gulp.task('listenExactTarget', function() {
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
 
-gulp.task('test', function() {
+gulp.task('buildEmailIngestDeployZip', function() {
+    gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
+        .pipe(zip('target/riffraff/artifacts.zip'))
+        .pipe(gulp.dest('.'));
+});
+
+gulp.task('uploadEmailIngestToRiffraff', function() {
+    var packageName = 'dotcom:email-signup-email-ingest';
+    var branch = 'master';
+    var leadDir = 'target/riffraff';
+
+    return riffraff.s3Upload(packageName, branch, leadDir);
+});
+
+gulp.task('emailIngestToRiffRaff', function(cb) {
+    runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
 });
