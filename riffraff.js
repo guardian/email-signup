@@ -21,9 +21,9 @@ function s3Upload(packageName, branch, leadDir) {
         leadDir: leadDir,
         packageName: packageName,
         buildId: buildId,
-        artifactsFilename: 'artifact.zip',
+        artifactsFilename: 'artifacts.zip',
         artifactBucket: 'riffraff-test-artifact',
-        manifestFile: 'deploy.json',
+        manifestFile: 'build.json',
         manifestBucket: 'riffraff-test-build'
     };
 
@@ -78,6 +78,7 @@ function s3Upload(packageName, branch, leadDir) {
         s3.upload({
             Bucket: SETTINGS.manifestBucket,
             Key: manifestPath,
+            ContentType: 'application/json',
             Body: JSON.stringify(MANIFEST),
             ACL: "bucket-owner-full-control"
         }, (err, success) => {
