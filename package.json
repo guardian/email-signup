@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "aws-sdk": "2.2.11",
+    "bluebird": "^3.1.4",
     "grunt": "0.4.*",
     "grunt-aws-lambda": "0.10.0",
     "gulp": "^3.9.0",
