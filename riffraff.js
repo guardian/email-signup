@@ -17,9 +17,9 @@ function s3Upload(packageName, branch, leadDir) {
         packageName: packageName,
         buildId: buildId,
         artifactsFilename: 'artifacts.zip',
-        artifactBucket: 'riffraff-artifact',
+        artifactBucket: 'riffraff-test-artifact',
         manifestFile: 'build.json',
-        manifestBucket: 'riffraff-builds'
+        manifestBucket: 'riffraff-test-build'
     };
 
     var now = new Date();

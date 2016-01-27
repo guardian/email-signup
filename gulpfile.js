@@ -67,7 +67,7 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip(zipLocation))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest(tempDistDirectory));
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
@@ -186,7 +186,7 @@ gulp.task('buildEmailIngestDeployZip', function() {
     console.log('Writing email ingest artifacts.zip to ' + artifactsLocation);
     gulp.src([tempDistDirectory + '/**/*', 'deploy/email-ingest/deploy.json'])
         .pipe(zip(artifactsLocation))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest(tempDirectory));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
