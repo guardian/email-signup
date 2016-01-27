@@ -38,7 +38,7 @@ function s3Upload(packageName, branch, leadDir) {
     console.log('Loading local artifact from ' + localArtifactFile);
 
     // build the path
-    var rootPath = ['./', SETTINGS.packageName, SETTINGS.buildId].join("/");
+    var rootPath = [SETTINGS.packageName, SETTINGS.buildId].join("/");
     console.log('Root path for deploy is '+ rootPath);
 
     var artifactPromise = new Promise(function(resolve, reject){
