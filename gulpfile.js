@@ -29,11 +29,6 @@ var env = (function() {
 var envConfig = 'email-signup-config-' + env + '.js';
 var config = 'email-signup-config.js';
 
-var temporaryArtifactDirectory = 'target/riffraff';
-var tempDirectory = process.env.TMPDIR ? process.env.TMPDIR + '/' + temporaryArtifactDirectory : temporaryArtifactDirectory;
-
-var tempDistDirectory = process.env.TMPDIR ? process.env.TMPDIR + '/' + 'dist' : 'dist';
-
 
 function getConfig() {
   return require(envConfig);
@@ -59,15 +54,13 @@ gulp.task('writeConfig', function() {
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
     var Config = require('./node_modules/email-signup-config');
-    var zipLocation = tempDistDirectory + '/packages/email-ingest/email-ingest-handler-' + env + '.zip';
-    console.log('Writing email-ingest-handler to ' + zipLocation);
     return gulp.src([
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip(zipLocation))
-        .pipe(gulp.dest(tempDistDirectory));
+        .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
@@ -103,7 +96,7 @@ gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
             'node_modules/monapt**/**/*',
             'node_modules/bluebird**/**/*'])
         .pipe(zip('dist/packages/email-signup/subscribe-handler-' + env + '.zip'))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest('./'));
 });
 
 gulp.task('uploadSubscribeHandler', function() {
@@ -182,21 +175,19 @@ gulp.task('listenExactTarget', function() {
 });
 
 gulp.task('buildEmailIngestDeployZip', function() {
-    var artifactsLocation = tempDirectory + '/artifacts.zip';
-    console.log('Writing email ingest artifacts.zip to ' + artifactsLocation);
-    gulp.src([tempDistDirectory + '/**/*', 'deploy/email-ingest/deploy.json'])
-        .pipe(zip(artifactsLocation))
-        .pipe(gulp.dest(tempDirectory));
+   return gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
+        .pipe(zip('target/riffraff/artifacts.zip'))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
     var packageName = 'dotcom:email-signup-ingest';
     var branch = 'master';
-    var leadDir = tempDirectory;
+    var leadDir = 'target/riffraff';
 
     return riffraff.s3Upload(packageName, branch, leadDir);
 });
 
 gulp.task('emailIngestToRiffRaff', function(cb) {
-    runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
+    return runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
 });

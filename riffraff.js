@@ -17,9 +17,9 @@ function s3Upload(packageName, branch, leadDir) {
         packageName: packageName,
         buildId: buildId,
         artifactsFilename: 'artifacts.zip',
-        artifactBucket: 'riffraff-test-artifact',
+        artifactBucket: 'aws-frontend-teamcity',
         manifestFile: 'build.json',
-        manifestBucket: 'riffraff-test-build'
+        manifestBucket: 'aws-frontend-teamcity'
     };
 
     var now = new Date();
@@ -34,6 +34,7 @@ function s3Upload(packageName, branch, leadDir) {
 
 
     var s3 = new AWS.S3();
+    console.log(new AWS.Config().credentials);
     var localArtifactFile = SETTINGS.leadDir + "/" + SETTINGS.artifactsFilename;
     console.log('Loading local artifact from ' + localArtifactFile);
 
@@ -54,6 +55,8 @@ function s3Upload(packageName, branch, leadDir) {
         };
         s3.upload(params, function(err, success){
             if (err) {
+                console.log(err);
+                console.log(JSON.stringify(err));
                 throw Error(err);
             }
             console.log("Artifact Upload Error: " + err);
