@@ -182,8 +182,10 @@ gulp.task('listenExactTarget', function() {
 });
 
 gulp.task('buildEmailIngestDeployZip', function() {
+    var artifactsLocation = tempDirectory + '/artifacts.zip';
+    console.log('Writing email ingest artifacts.zip to ' + artifactsLocation);
     gulp.src([tempDistDirectory + '/**/*', 'deploy/email-ingest/deploy.json'])
-        .pipe(zip(tempDirectory + '/artifacts.zip'))
+        .pipe(zip(artifactsLocation))
         .pipe(gulp.dest('.'));
 });
 
