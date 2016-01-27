@@ -59,12 +59,14 @@ gulp.task('writeConfig', function() {
 //Email Ingestion
 gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
     var Config = require('./node_modules/email-signup-config');
+    var zipLocation = tempDistDirectory + '/packages/email-ingest/email-ingest-handler-' + env + '.zip';
+    console.log('Writing email-ingest-handler to ' + zipLocation);
     return gulp.src([
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip(tempDistDirectory + '/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
+        .pipe(zip(zipLocation))
         .pipe(gulp.dest('.'));
 });
 
