@@ -29,6 +29,12 @@ var env = (function() {
 var envConfig = 'email-signup-config-' + env + '.js';
 var config = 'email-signup-config.js';
 
+var temporaryArtifactDirectory = 'target/riffraff';
+var tempDirectory = process.env.TMPDIR ? process.env.TMPDIR + '/' + temporaryArtifactDirectory : temporaryArtifactDirectory;
+
+var tempDistDirectory = process.env.TMPDIR ? process.env.TMPDIR + '/' + 'dist' : 'dist';
+
+
 function getConfig() {
   return require(envConfig);
 }
@@ -58,7 +64,7 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'src/emailingest.js',
             'node_modules/validator/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
+        .pipe(zip(tempDistDirectory + '/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
@@ -173,18 +179,16 @@ gulp.task('listenExactTarget', function() {
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
 
-var tempDir = process.env.TMPDIR ? process.env.TMPDIR + 'target/riffraff' : 'target/riffraff';
-
 gulp.task('buildEmailIngestDeployZip', function() {
-    gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
-        .pipe(zip(tempDir + '/artifacts.zip'))
+    gulp.src([tempDistDirectory + '/**/*', 'deploy/email-ingest/deploy.json'])
+        .pipe(zip(tempDirectory + '/artifacts.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
     var packageName = 'dotcom:email-signup-ingest';
     var branch = 'master';
-    var leadDir = tempDir;
+    var leadDir = tempDirectory;
 
     return riffraff.s3Upload(packageName, branch, leadDir);
 });
