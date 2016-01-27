@@ -173,16 +173,18 @@ gulp.task('listenExactTarget', function() {
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
 
+var tempDir = process.env.TMPDIR ? process.env.TMPDIR + 'target/riffraff' : 'target/riffraff';
+
 gulp.task('buildEmailIngestDeployZip', function() {
     gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
-        .pipe(zip('target/riffraff/artifacts.zip'))
+        .pipe(zip(tempDir + '/artifacts.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
     var packageName = 'dotcom:email-signup-ingest';
     var branch = 'master';
-    var leadDir = 'target/riffraff';
+    var leadDir = tempDir;
 
     return riffraff.s3Upload(packageName, branch, leadDir);
 });
