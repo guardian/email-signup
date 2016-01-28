@@ -188,6 +188,25 @@ gulp.task('uploadEmailIngestToRiffraff', function() {
     return riffraff.s3Upload(packageName, branch, leadDir);
 });
 
+gulp.task('buildExactTargetHandlerDeployZip', function() {
+   return gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
+        .pipe(zip('target/riffraff/artifacts.zip'))
+        .pipe(gulp.dest('.'));
+});
+
+gulp.task('uploadExactTargetHandlerToRiffraff', function() {
+    var packageName = 'dotcom:email-signup-exact-target-handler';
+    var branch = 'master';
+    var leadDir = 'target/riffraff';
+
+    return riffraff.s3Upload(packageName, branch, leadDir);
+});
+
+//DEV Tasks
 gulp.task('emailIngestToRiffRaff', function(cb) {
     return runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
+});
+
+gulp.task('exactTargetHandlerToRiffRaff', function(cb) {
+    return runSequence('clean', 'buildSubscribeHandler', 'buildExactTargetHandlerDeployZip', 'uploadExactTargetHandlerToRiffraff', cb);
 });
