@@ -189,7 +189,7 @@ gulp.task('uploadEmailIngestToRiffraff', function() {
 });
 
 gulp.task('buildExactTargetHandlerDeployZip', function() {
-   return gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
+   return gulp.src(['dist/**/*', 'deploy/subscribe-handler/deploy.json'])
         .pipe(zip('target/riffraff/artifacts.zip'))
         .pipe(gulp.dest('.'));
 });
