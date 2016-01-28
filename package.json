@@ -24,8 +24,7 @@
     "gulp-zip": "^3.0.2",
     "kinesis": "^1.2.2",
     "npm": "~3.3.9",
-    "vinyl-fs": "^2.2.1",
-    "vinyl-s3": "^0.3.0"
+    "vinyl-fs": "^2.2.1"
   },
   "dependencies": {
     "fuel-soap": "^1.2.0",
