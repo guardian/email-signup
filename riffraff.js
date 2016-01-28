@@ -17,9 +17,9 @@ function s3Upload(packageName, branch, leadDir) {
         packageName: packageName,
         buildId: buildId,
         artifactsFilename: 'artifacts.zip',
-        artifactBucket: 'aws-frontend-teamcity',
+        artifactBucket: 'riffraff-artifact',
         manifestFile: 'build.json',
-        manifestBucket: 'aws-frontend-teamcity'
+        manifestBucket: 'riffraff-builds'
     };
 
     var now = new Date();
