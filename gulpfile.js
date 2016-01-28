@@ -95,7 +95,7 @@ gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
             'node_modules/fuel-soap**/**/*',
             'node_modules/monapt**/**/*',
             'node_modules/bluebird**/**/*'])
-        .pipe(zip('dist/packages/email-signup/subscribe-handler-' + env + '.zip'))
+        .pipe(zip('dist/packages/exact-target-handler/subscribe-handler-' + env + '.zip'))
         .pipe(gulp.dest('./'));
 });
 
