@@ -3,6 +3,7 @@ var gulp   = require('gulp');
 var lambda = require('gulp-awslambda');
 var zip    = require('gulp-zip');
 var yaml = require('gulp-yaml');
+var s3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
 var runSequence = require('gulp-run-sequence');
@@ -128,6 +129,13 @@ gulp.task('buildCloudformation', function() {
     return gulp.src('./cloudformation/*.yml')
         .pipe(yaml({ schema: 'DEFAULT_SAFE_SCHEMA' }))
         .pipe(gulp.dest('./dist'));
+});
+
+//Credentials
+gulp.task('downloadCredentials', function() {
+    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js', { buffer: false })
+        .pipe(flatten())
+        .pipe(gulp.dest('./node_modules'));
 });
 
 gulp.task('typescript', function () {
