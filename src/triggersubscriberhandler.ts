@@ -58,7 +58,8 @@ const createTriggeredSend = (emailData: EmailData): TriggeredSend => {
     const subscriber: Subscriber = {
         EmailAddress: email,
         SubscriberKey: email,
-        Attributes: [ subscriberEmailGroup, referrerAttribute, campaignCodeAttribute ]
+        Attributes: [ subscriberEmailGroup, referrerAttribute, campaignCodeAttribute ],
+        Status: "Active"
     };
 
     const triggeredSend = {
@@ -85,7 +86,8 @@ const createSubscription = (emailData: EmailData): Subscriber => {
     const subscription = {
         EmailAddress: email,
         SubscriberKey: email,
-        Lists: [ listSubscriber ]
+        Lists: [ listSubscriber ],
+        Status: "Active"
     };
 
     console.log("Created Subscription: " + JSON.stringify(subscription));
