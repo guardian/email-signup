@@ -81,9 +81,9 @@ function s3Upload(packageName, branch, leadDir) {
             ACL: "bucket-owner-full-control"
         }, function(err, success){
             if (err) {
+                console.log("Manifest Upload Error: " + err);
                 throw err;
             }
-            console.log("Manifest Upload Error: " + err);
             console.log("Manifest Upload Success: " + JSON.stringify(success));
             console.log(["Uploaded riffraff manifest to", manifestPath, "in",
                 SETTINGS.manifestBucket].join(" "));

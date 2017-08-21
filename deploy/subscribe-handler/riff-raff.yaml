@@ -1,0 +1,16 @@
+stacks:
+- frontend
+regions:
+- eu-west1
+deployments:
+  exact-target-handler:
+    type: aws-lambda
+    parameters:
+      functions:
+        CODE:
+          name: EmailSignup-CODE-ExactTargetHandler-CJKH1MCDV01V
+          filename: subscribe-handler-CODE.zip
+        PROD:
+          name: EmailSignup-PROD-ExactTargetHandler-1BMNSZHXIJQOG
+          filename: subscribe-handler-PROD.zip
+      bucket: aws-frontend-artifacts

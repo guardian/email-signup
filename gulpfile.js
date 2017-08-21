@@ -185,7 +185,7 @@ gulp.task('uploadEmailIngestToRiffraff', function() {
 });
 
 gulp.task('buildExactTargetHandlerDeployZip', function() {
-   return gulp.src(['dist/**/*', 'deploy/subscribe-handler/deploy.json'])
+   return gulp.src(['dist/**/*', 'deploy/subscribe-handler/riff-raff.yaml'])
         .pipe(zip('target/riffraff/artifacts.zip'))
         .pipe(gulp.dest('.'));
 });
