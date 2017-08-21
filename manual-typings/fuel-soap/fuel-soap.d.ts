@@ -15,6 +15,7 @@ interface Subscriber {
     SubscriberKey: string;
     Lists?: Array<ListSubscriber>;
     Attributes?: Array<ExtraAttribute>;
+    Status: string;
 }
 
 interface TriggeredSendDefinition {
