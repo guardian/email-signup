@@ -57,15 +57,14 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
     return gulp.src([
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
-            'node_modules/validator/*',
-            'node_modules/bluebird**/**/*'])
+            'node_modules**/**/*.*'])
         .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
-    return fs.src('dist/' + emailIngestHandler)
+    return fs.src('dist/packages/email-ingest/' + emailIngestHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -79,7 +78,7 @@ gulp.task('updateEmailIngestHandler', function() {
 
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
 
-    return gulp.src('dist/' + emailIngestHandler)
+    return gulp.src('dist/packages/email-ingest/' + emailIngestHandler)
         .pipe(lambda(emailIngestHandlerConfig, lambdaOptions))
 });
 
@@ -90,18 +89,15 @@ gulp.task('emailIngest', function(cb) {
 //Email Subscribe
 gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
     return gulp.src([
-            'built/triggersubscriberhandler.js',
-            'node_modules/email-signup-config.js',
-            'node_modules/fuel-soap**/**/*',
-            'node_modules/monapt**/**/*',
-            'node_modules/bluebird**/**/*'])
+        'built/triggersubscriberhandler.js',
+        'node_modules**/**/*.*'])
         .pipe(zip('dist/packages/exact-target-handler/subscribe-handler-' + env + '.zip'))
         .pipe(gulp.dest('./'));
 });
 
 gulp.task('uploadSubscribeHandler', function() {
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
-    return fs.src('dist/' + subscribeHandler)
+    return fs.src('dist/packages/exact-target-handler/' + subscribeHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -116,7 +112,7 @@ gulp.task('updateSubscribeHandler', function() {
 
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
 
-    return gulp.src('dist/' + subscribeHandler)
+    return gulp.src('dist/packages/exact-target-handler/' + subscribeHandler)
         .pipe(lambda(subscribeHandlerConfig, lambdaOptions))
 });
 
