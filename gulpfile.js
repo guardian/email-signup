@@ -91,13 +91,13 @@ gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
     return gulp.src([
         'built/triggersubscriberhandler.js',
         'node_modules**/**/*.*'])
-        .pipe(zip('dist/packages/exact-target-handler/subscribe-handler-' + env + '.zip'))
+        .pipe(zip('dist/exact-target-handler/subscribe-handler-' + env + '.zip'))
         .pipe(gulp.dest('./'));
 });
 
 gulp.task('uploadSubscribeHandler', function() {
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
-    return fs.src('dist/packages/exact-target-handler/' + subscribeHandler)
+    return fs.src('dist/exact-target-handler/' + subscribeHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -112,7 +112,7 @@ gulp.task('updateSubscribeHandler', function() {
 
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
 
-    return gulp.src('dist/packages/exact-target-handler/' + subscribeHandler)
+    return gulp.src('dist/exact-target-handler/' + subscribeHandler)
         .pipe(lambda(subscribeHandlerConfig, lambdaOptions))
 });
 
