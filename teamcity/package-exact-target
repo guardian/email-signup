@@ -11,14 +11,7 @@ npm install -g gulp
 
 npm install -g tsd
 tsd install
-gulp typescript
 
-gulp downloadCredentials
-gulp downloadCredentials --prod
-
-gulp clean
-gulp buildSubscribeHandler
-gulp buildSubscribeHandler --prod
-gulp buildExactTargetHandlerDeployZip
-gulp uploadExactTargetHandlerToRiffraff
+gulp exactTargetHandlerToRiffRaff
+gulp exactTargetHandlerToRiffRaff --prod
 

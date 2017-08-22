@@ -87,7 +87,7 @@ gulp.task('emailIngest', function(cb) {
 });
 
 //Email Subscribe
-gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
+gulp.task('buildSubscribeHandler', ['writeConfig'], function() {
     return gulp.src([
         'built/triggersubscriberhandler.js',
         'node_modules**/**/*.*'])
@@ -170,37 +170,51 @@ gulp.task('listenExactTarget', function() {
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
 
-gulp.task('buildEmailIngestDeployZip', function() {
+gulp.task('buildEmailIngestRiffRaffPackage', function() {
    return gulp.src(['dist/**/*', 'deploy/email-ingest/riff-raff.yaml'])
-        .pipe(zip('target/riffraff/artifacts.zip'))
-        .pipe(gulp.dest('.'));
+        .pipe(gulp.dest('target/riffraff/'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
-    var packageName = 'dotcom:email-signup-ingest';
-    var leadDir = 'target/riffraff';
+    const projectName = 'dotcom:email-signup-ingest';
+    const srcRootDir = 'target/riffraff';
+    const srcArtifactFile = 'email-ingest/email-ingest-handler-' + env + '.zip';
 
-    return riffraff.s3Upload(packageName, leadDir);
+    return riffraff.s3Upload(projectName, srcRootDir, srcArtifactFile);
 });
 
-gulp.task('buildExactTargetHandlerDeployZip', function() {
+gulp.task('buildExactTargetHandlerRiffRaffPackage', function() {
    return gulp.src(['dist/**/*', 'deploy/subscribe-handler/riff-raff.yaml'])
-        .pipe(zip('target/riffraff/artifacts.zip'))
-        .pipe(gulp.dest('.'));
+       .pipe(gulp.dest('target/riffraff/'));
 });
 
 gulp.task('uploadExactTargetHandlerToRiffraff', function() {
-    var packageName = 'dotcom:email-signup-exact-target-handler';
-    var leadDir = 'target/riffraff';
+    const projectName = 'dotcom:email-signup-exact-target-handler';
+    const srcRootDir = 'target/riffraff';
+    const srcArtifactFile = 'exact-target-handler/subscribe-handler-' + env + '.zip';
 
-    return riffraff.s3Upload(packageName, leadDir);
+    return riffraff.s3Upload(projectName, srcRootDir, srcArtifactFile);
 });
 
-//DEV Tasks
-gulp.task('emailIngestToRiffRaff', function(cb) {
-    return runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
-});
+//build and deploy to riff-raff
+gulp.task('emailIngestToRiffRaff',
+    [
+        'clean',
+        'typescript',
+        'downloadCredentials',
+        'buildEmailIngestHandler',
+        'buildEmailIngestRiffRaffPackage',
+        'uploadEmailIngestToRiffraff',
+    ]
+);
 
-gulp.task('exactTargetHandlerToRiffRaff', function(cb) {
-    return runSequence('clean', 'buildSubscribeHandler', 'buildExactTargetHandlerDeployZip', 'uploadExactTargetHandlerToRiffraff', cb);
-});
+gulp.task('exactTargetHandlerToRiffRaff',
+    [
+        'clean',
+        'typescript',
+        'downloadCredentials',
+        'buildSubscribeHandler',
+        'buildExactTargetHandlerRiffRaffPackage',
+        'uploadExactTargetHandlerToRiffraff'
+    ]
+);

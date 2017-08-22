@@ -2,97 +2,100 @@ var AWS = require('aws-sdk');
 var Promise = require('bluebird');
 var fs = require('fs');
 
+function s3Upload(projectName, srcRootDir, srcArtifactFile) {
 
-function s3Upload(packageName, leadDir) {
-
-    if (!packageName) throw Error('s3Upload requires packageName');
+    if (!projectName) throw Error('s3Upload requires packageName');
     if (!process.env.BRANCH_NAME) throw Error('No env.BRANCH_NAME set (%teamcity.build.branch%)');
-    if (!leadDir) throw Error('s3Upload requires leadDir');
+    if (!srcRootDir) throw Error('s3Upload requires leadDir');
     if (!process.env.BUILD_NUMBER) throw Error('No env.BUILD_NUMBER set');
+    if (!srcArtifactFile) throw Error('s3Upload requires srcArtifactFile');
 
-    var buildId = process.env.BUILD_NUMBER;
-    var branch = process.env.BRANCH_NAME;
-    var revision = process.env.BUILD_VCS_NUMBER;
+    const buildId = process.env.BUILD_NUMBER;
+    const branch = process.env.BRANCH_NAME;
+    const revision = process.env.BUILD_VCS_NUMBER;
 
-    var SETTINGS = {
-        leadDir: leadDir,
-        packageName: packageName,
-        buildId: buildId,
-        artifactsFilename: 'artifacts.zip',
-        artifactBucket: 'riffraff-artifact',
-        manifestFile: 'build.json',
-        manifestBucket: 'riffraff-builds'
-    };
+    // var buildId = 62;
+    // var branch = 'fix-riffraff-deploy';
+    // var revision = 'uknown';
+    // // var packageName = 'dotcom:email-signup-ingest';
+    // // var srcRootDir = 'target/riffraff';
 
-    var now = new Date();
-    var MANIFEST = {
-        branch: branch,
-        vcsURL: 'https://github.com/guardian/email-signup',
-        revision: revision,
-        startTime: now.toISOString(),
-        buildNumber: buildId,
-        projectName: packageName
-    };
+    const s3 = new AWS.S3();
 
+    const destRootDir = [projectName, buildId].join("/");
 
-    var s3 = new AWS.S3();
-    console.log(new AWS.Config().credentials);
-    var localArtifactFile = SETTINGS.leadDir + "/" + SETTINGS.artifactsFilename;
-    console.log('Loading local artifact from ' + localArtifactFile);
+    function uploadFileToS3(src, dest, bucket) {
+        return new Promise(function (resolve, reject) {
+            console.log('Uploading local file: ' + src);
+            console.log(`Uploading to ${bucket}/${dest}`);
 
-    // build the path
-    var rootPath = [SETTINGS.packageName, SETTINGS.buildId].join("/");
-    console.log('Root path for deploy is '+ rootPath);
+            const params = {
+                Bucket: bucket,
+                Key: dest,
+                Body: fs.createReadStream(src),
+                ACL: "bucket-owner-full-control"
+            };
 
-    var artifactPromise = new Promise(function(resolve, reject){
-        var artifactPath = rootPath + "/" + SETTINGS.artifactsFilename;
-        console.log("Uploading artifact to " + artifactPath);
-
-        var stream = fs.createReadStream(localArtifactFile);
-        var params = {
-            Bucket: SETTINGS.artifactBucket,
-            Key: artifactPath,
-            Body: stream,
-            ACL: "bucket-owner-full-control"
-        };
-        s3.upload(params, function(err, success){
-            if (err) {
-                console.log("Artifact Upload Error: " + err);
-                console.log(JSON.stringify(err));
-                throw Error(err);
-            }
-            console.log("Artifact Upload Success: " + JSON.stringify(success));
-            console.log(["Uploaded riffraff artifact to", artifactPath, "in",
-                SETTINGS.artifactBucket].join(" "));
-            return resolve(success);
+            s3.upload(params, function (err, success) {
+                if (err) {
+                    console.log(`Upload error: ${JSON.stringify(err)}`);
+                    throw Error(err);
+                }
+                console.log(`Successfully uploaded to ${success.Location}`);
+                return resolve(success);
+            });
         });
-    });
+    }
 
+    function uploadManifestFile(dest, bucket) {
+        new Promise(function(resolve, reject){
 
-    // upload the manifest
-    var manifestPromise = new Promise(function(resolve, reject){
-        var manifestPath = rootPath + "/" + SETTINGS.manifestFile;
-        console.log("Uploading manifest to " + manifestPath);
+            const src = {
+                branch: branch,
+                vcsURL: 'https://github.com/guardian/email-signup',
+                revision: revision,
+                startTime: (new Date()).toISOString(),
+                buildNumber: buildId,
+                projectName: projectName
+            };
 
-        s3.upload({
-            Bucket: SETTINGS.manifestBucket,
-            Key: manifestPath,
-            ContentType: 'application/json',
-            Body: JSON.stringify(MANIFEST),
-            ACL: "bucket-owner-full-control"
-        }, function(err, success){
-            if (err) {
-                console.log("Manifest Upload Error: " + err);
-                throw err;
-            }
-            console.log("Manifest Upload Success: " + JSON.stringify(success));
-            console.log(["Uploaded riffraff manifest to", manifestPath, "in",
-                SETTINGS.manifestBucket].join(" "));
-            return resolve(success);
+            console.log(`Uploading manifest: ${JSON.stringify(src)}`);
+            console.log(`Uploading to ${bucket}/${dest}`);
+
+            s3.upload({
+                Bucket: bucket,
+                Key: dest,
+                ContentType: 'application/json',
+                Body: JSON.stringify(src),
+                ACL: "bucket-owner-full-control"
+            }, function(err, success){
+                if (err) {
+                    console.log(`Upload error: ${JSON.stringify(err)}`);
+                    throw err;
+                }
+                console.log(`Successfully uploaded to ${success.Location}`);
+                return resolve(success);
+            });
         });
-    });
+    }
 
-    return Promise.all([manifestPromise, artifactPromise]);
+    const manifestPromise = uploadManifestFile(
+        destRootDir + "/build.json",
+        "riffraff-builds");
+
+    const riffRaffYamlPromise = uploadFileToS3(
+        srcRootDir + "/" + "riff-raff.yaml",
+        destRootDir + "/" + "riff-raff.yaml",
+        'riffraff-artifact'
+    );
+
+    const artifactPromise = uploadFileToS3(
+        srcRootDir + "/" + srcArtifactFile,
+        destRootDir + "/" + srcArtifactFile,
+        'riffraff-artifact'
+    );
+
+    return Promise.all([manifestPromise, riffRaffYamlPromise, artifactPromise]);
 }
 
 module.exports = {

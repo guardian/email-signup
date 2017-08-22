@@ -11,14 +11,6 @@ npm install -g gulp
 
 npm install -g tsd
 tsd install
-gulp typescript
 
-gulp downloadCredentials
-gulp downloadCredentials --prod
-
-gulp clean
-gulp buildEmailIngestHandler
-gulp buildEmailIngestHandler --prod
-gulp buildEmailIngestDeployZip
-gulp uploadEmailIngestToRiffraff
-
+gulp emailIngestToRiffRaff
+gulp emailIngestToRiffRaff --prod
