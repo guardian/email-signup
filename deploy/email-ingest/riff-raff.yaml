@@ -1,0 +1,16 @@
+stacks:
+- frontend
+regions:
+- eu-west-1
+deployments:
+  exact-target-handler:
+    type: aws-lambda
+    parameters:
+      bucket: aws-frontend-artifacts
+      functions:
+        CODE:
+          name: EmailSignup-CODE-EmailHandler-LP8EDN14CDKZ
+          filename: email-ingest-handler-CODE.zip
+        PROD:
+          name: EmailSignup-PROD-EmailHandler-OC7MDZRGHS6X
+          filename: email-ingest-handler-PROD.zip

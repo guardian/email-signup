@@ -58,13 +58,13 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
             'node_modules**/**/*.*'])
-        .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
+        .pipe(zip('dist/email-ingest/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
-    return fs.src('dist/packages/email-ingest/' + emailIngestHandler)
+    return fs.src('dist/email-ingest/' + emailIngestHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -78,7 +78,7 @@ gulp.task('updateEmailIngestHandler', function() {
 
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
 
-    return gulp.src('dist/packages/email-ingest/' + emailIngestHandler)
+    return gulp.src('dist/email-ingest/' + emailIngestHandler)
         .pipe(lambda(emailIngestHandlerConfig, lambdaOptions))
 });
 
@@ -171,14 +171,14 @@ gulp.task('listenExactTarget', function() {
 });
 
 gulp.task('buildEmailIngestDeployZip', function() {
-   return gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
+   return gulp.src(['dist/**/*', 'deploy/email-ingest/riff-raff.yaml'])
         .pipe(zip('target/riffraff/artifacts.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
     var packageName = 'dotcom:email-signup-ingest';
-    var branch = 'master';
+    var branch = process.env.BRANCH_NAME;
     var leadDir = 'target/riffraff';
 
     return riffraff.s3Upload(packageName, branch, leadDir);
