@@ -3,14 +3,15 @@ var Promise = require('bluebird');
 var fs = require('fs');
 
 
-function s3Upload(packageName, branch, leadDir) {
+function s3Upload(packageName, leadDir) {
 
     if (!packageName) throw Error('s3Upload requires packageName');
-    if (!branch) throw Error('s3Upload requires branch');
+    if (!process.env.BRANCH_NAME) throw Error('No env.BRANCH_NAME set (%teamcity.build.branch%)');
     if (!leadDir) throw Error('s3Upload requires leadDir');
-    if (!process.env.BUILD_NUMBER) throw Error('No BUILD_NUMBER set');
+    if (!process.env.BUILD_NUMBER) throw Error('No env.BUILD_NUMBER set');
 
     var buildId = process.env.BUILD_NUMBER;
+    var branch = process.env.BRANCH_NAME;
 
     var SETTINGS = {
         leadDir: leadDir,

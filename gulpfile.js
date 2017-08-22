@@ -178,10 +178,9 @@ gulp.task('buildEmailIngestDeployZip', function() {
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
     var packageName = 'dotcom:email-signup-ingest';
-    var branch = process.env.BRANCH_NAME;
     var leadDir = 'target/riffraff';
 
-    return riffraff.s3Upload(packageName, branch, leadDir);
+    return riffraff.s3Upload(packageName, leadDir);
 });
 
 gulp.task('buildExactTargetHandlerDeployZip', function() {
@@ -192,10 +191,9 @@ gulp.task('buildExactTargetHandlerDeployZip', function() {
 
 gulp.task('uploadExactTargetHandlerToRiffraff', function() {
     var packageName = 'dotcom:email-signup-exact-target-handler';
-    var branch = process.env.BRANCH_NAME;
     var leadDir = 'target/riffraff';
 
-    return riffraff.s3Upload(packageName, branch, leadDir);
+    return riffraff.s3Upload(packageName, leadDir);
 });
 
 //DEV Tasks
