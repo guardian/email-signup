@@ -55,11 +55,10 @@ function s3Upload(packageName, branch, leadDir) {
         };
         s3.upload(params, function(err, success){
             if (err) {
-                console.log(err);
+                console.log("Artifact Upload Error: " + err);
                 console.log(JSON.stringify(err));
                 throw Error(err);
             }
-            console.log("Artifact Upload Error: " + err);
             console.log("Artifact Upload Success: " + JSON.stringify(success));
             console.log(["Uploaded riffraff artifact to", artifactPath, "in",
                 SETTINGS.artifactBucket].join(" "));

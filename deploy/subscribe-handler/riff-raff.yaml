@@ -1,5 +1,7 @@
-stacks: frontend
-regions: eu-west-1
+stacks:
+- frontend
+regions:
+- eu-west-1
 deployments:
   exact-target-handler:
     type: aws-lambda

@@ -5,3 +5,4 @@ typings/
 *.js.map
 built/
 email-signup-config*.js
+target/
