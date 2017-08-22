@@ -12,6 +12,7 @@ function s3Upload(packageName, leadDir) {
 
     var buildId = process.env.BUILD_NUMBER;
     var branch = process.env.BRANCH_NAME;
+    var revision = process.env.BUILD_VCS_NUMBER;
 
     var SETTINGS = {
         leadDir: leadDir,
@@ -27,7 +28,7 @@ function s3Upload(packageName, leadDir) {
     var MANIFEST = {
         branch: branch,
         vcsURL: 'https://github.com/guardian/email-signup',
-        revision: 'unknownRevision',
+        revision: revision,
         startTime: now.toISOString(),
         buildNumber: buildId,
         projectName: packageName
