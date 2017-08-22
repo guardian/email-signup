@@ -5,13 +5,20 @@ set -o nounset
 set -o errexit
 set -x
 
-[ -d dist ] && rm -R dist
+npm install
 
+npm install -g gulp
+
+npm install -g tsd
+tsd install
+gulp typescript
+
+gulp downloadCredentials
+gulp downloadCredentials --prod
+
+gulp clean
 gulp buildEmailIngestHandler
 gulp buildEmailIngestHandler --prod
-
-cp deploy/deploy-email-ingest.json ./dist/deploy.json
-
-zip --junk-paths -r ./dist/artifacts.zip dist/packages/ dist/deploy.json
-
+gulp buildEmailIngestDeployZip
+gulp uploadEmailIngestToRiffraff
 
