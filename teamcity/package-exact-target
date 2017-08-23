@@ -5,12 +5,12 @@ set -o nounset
 set -o errexit
 set -x
 
-[ -d dist ] && rm -R dist
+npm install
 
-gulp buildSubscribeHandler
-gulp buildSubscribeHandler --prod
+npm install -g gulp
 
-cp deploy/deploy-subscribe-handler.json ./dist/deploy.json
+npm install -g tsd
+tsd install
 
-zip --junk-paths ./dist/artifact.zip dist/subscribe-handler-*.zip dist/deploy.json
-
+gulp exactTargetHandlerToRiffRaff
+gulp exactTargetHandlerToRiffRaff --prod

@@ -6,7 +6,7 @@ var yaml = require('gulp-yaml');
 var s3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
-var runSequence = require('gulp-run-sequence');
+var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
 var ts = require('gulp-typescript');
 var rename = require('gulp-rename');
@@ -58,13 +58,13 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
             'node_modules/email-signup-config.js',
             'src/emailingest.js',
             'node_modules**/**/*.*'])
-        .pipe(zip('dist/packages/email-ingest/email-ingest-handler-' + env + '.zip'))
+        .pipe(zip('dist/email-ingest/email-ingest-handler-' + env + '.zip'))
         .pipe(gulp.dest('.'));
 });
 
 gulp.task('uploadEmailIngestHandler', function() {
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
-    return fs.src('dist/packages/email-ingest/' + emailIngestHandler)
+    return fs.src('dist/email-ingest/' + emailIngestHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -78,7 +78,7 @@ gulp.task('updateEmailIngestHandler', function() {
 
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
 
-    return gulp.src('dist/packages/email-ingest/' + emailIngestHandler)
+    return gulp.src('dist/email-ingest/' + emailIngestHandler)
         .pipe(lambda(emailIngestHandlerConfig, lambdaOptions))
 });
 
@@ -87,17 +87,17 @@ gulp.task('emailIngest', function(cb) {
 });
 
 //Email Subscribe
-gulp.task('buildSubscribeHandler', ['typescript', 'writeConfig'], function() {
+gulp.task('buildSubscribeHandler', ['writeConfig'], function() {
     return gulp.src([
         'built/triggersubscriberhandler.js',
         'node_modules**/**/*.*'])
-        .pipe(zip('dist/packages/exact-target-handler/subscribe-handler-' + env + '.zip'))
+        .pipe(zip('dist/exact-target-handler/subscribe-handler-' + env + '.zip'))
         .pipe(gulp.dest('./'));
 });
 
 gulp.task('uploadSubscribeHandler', function() {
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
-    return fs.src('dist/packages/exact-target-handler/' + subscribeHandler)
+    return fs.src('dist/exact-target-handler/' + subscribeHandler)
         .pipe(s3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
@@ -112,7 +112,7 @@ gulp.task('updateSubscribeHandler', function() {
 
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
 
-    return gulp.src('dist/packages/exact-target-handler/' + subscribeHandler)
+    return gulp.src('dist/exact-target-handler/' + subscribeHandler)
         .pipe(lambda(subscribeHandlerConfig, lambdaOptions))
 });
 
@@ -170,39 +170,50 @@ gulp.task('listenExactTarget', function() {
     return kinesisPrinter(getConfig().Streams.exactTargetStatusStream);
 });
 
-gulp.task('buildEmailIngestDeployZip', function() {
-   return gulp.src(['dist/**/*', 'deploy/email-ingest/deploy.json'])
-        .pipe(zip('target/riffraff/artifacts.zip'))
-        .pipe(gulp.dest('.'));
+gulp.task('buildEmailIngestRiffRaffPackage', function() {
+   return gulp.src(['dist/**/*', 'deploy/email-ingest/riff-raff.yaml'])
+        .pipe(gulp.dest('target/riffraff/'));
 });
 
 gulp.task('uploadEmailIngestToRiffraff', function() {
-    var packageName = 'dotcom:email-signup-ingest';
-    var branch = 'master';
-    var leadDir = 'target/riffraff';
+    const projectName = 'dotcom:email-signup-ingest';
+    const srcRootDir = 'target/riffraff';
+    const srcArtifactFile = 'email-ingest/email-ingest-handler-' + env + '.zip';
 
-    return riffraff.s3Upload(packageName, branch, leadDir);
+    return riffraff.s3Upload(projectName, srcRootDir, srcArtifactFile);
 });
 
-gulp.task('buildExactTargetHandlerDeployZip', function() {
-   return gulp.src(['dist/**/*', 'deploy/subscribe-handler/deploy.json'])
-        .pipe(zip('target/riffraff/artifacts.zip'))
-        .pipe(gulp.dest('.'));
+gulp.task('buildExactTargetHandlerRiffRaffPackage', function() {
+   return gulp.src(['dist/**/*', 'deploy/subscribe-handler/riff-raff.yaml'])
+       .pipe(gulp.dest('target/riffraff/'));
 });
 
 gulp.task('uploadExactTargetHandlerToRiffraff', function() {
-    var packageName = 'dotcom:email-signup-exact-target-handler';
-    var branch = 'master';
-    var leadDir = 'target/riffraff';
+    const projectName = 'dotcom:email-signup-exact-target-handler';
+    const srcRootDir = 'target/riffraff';
+    const srcArtifactFile = 'exact-target-handler/subscribe-handler-' + env + '.zip';
 
-    return riffraff.s3Upload(packageName, branch, leadDir);
+    return riffraff.s3Upload(projectName, srcRootDir, srcArtifactFile);
 });
 
-//DEV Tasks
-gulp.task('emailIngestToRiffRaff', function(cb) {
-    return runSequence('clean', 'buildEmailIngestHandler', 'buildEmailIngestDeployZip', 'uploadEmailIngestToRiffraff', cb);
+gulp.task('emailIngestToRiffRaff', function(callback) {
+    runSequence(
+        'clean',
+        'typescript',
+        'downloadCredentials',
+        'buildEmailIngestHandler',
+        'buildEmailIngestRiffRaffPackage',
+        'uploadEmailIngestToRiffraff'
+    );
 });
 
-gulp.task('exactTargetHandlerToRiffRaff', function(cb) {
-    return runSequence('clean', 'buildSubscribeHandler', 'buildExactTargetHandlerDeployZip', 'uploadExactTargetHandlerToRiffraff', cb);
+gulp.task('exactTargetHandlerToRiffRaff', function(callback) {
+    runSequence(
+        'clean',
+        'typescript',
+        'downloadCredentials',
+        'buildSubscribeHandler',
+        'buildExactTargetHandlerRiffRaffPackage',
+        'uploadExactTargetHandlerToRiffraff'
+    );
 });
