@@ -6,7 +6,7 @@ var yaml = require('gulp-yaml');
 var s3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
-var runSequence = require('gulp-run-sequence');
+var runSequence = require('run-sequence');
 var clean = require('gulp-clean');
 var ts = require('gulp-typescript');
 var rename = require('gulp-rename');
@@ -196,25 +196,24 @@ gulp.task('uploadExactTargetHandlerToRiffraff', function() {
     return riffraff.s3Upload(projectName, srcRootDir, srcArtifactFile);
 });
 
-//build and deploy to riff-raff
-gulp.task('emailIngestToRiffRaff',
-    [
+gulp.task('emailIngestToRiffRaff', function(callback) {
+    runSequence(
         'clean',
         'typescript',
         'downloadCredentials',
         'buildEmailIngestHandler',
         'buildEmailIngestRiffRaffPackage',
-        'uploadEmailIngestToRiffraff',
-    ]
-);
+        'uploadEmailIngestToRiffraff'
+    );
+});
 
-gulp.task('exactTargetHandlerToRiffRaff',
-    [
+gulp.task('exactTargetHandlerToRiffRaff', function(callback) {
+    runSequence(
         'clean',
         'typescript',
         'downloadCredentials',
         'buildSubscribeHandler',
         'buildExactTargetHandlerRiffRaffPackage',
         'uploadExactTargetHandlerToRiffraff'
-    ]
-);
+    );
+});

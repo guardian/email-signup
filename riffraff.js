@@ -14,12 +14,6 @@ function s3Upload(projectName, srcRootDir, srcArtifactFile) {
     const branch = process.env.BRANCH_NAME;
     const revision = process.env.BUILD_VCS_NUMBER;
 
-    // var buildId = 62;
-    // var branch = 'fix-riffraff-deploy';
-    // var revision = 'uknown';
-    // // var packageName = 'dotcom:email-signup-ingest';
-    // // var srcRootDir = 'target/riffraff';
-
     const s3 = new AWS.S3();
 
     const destRootDir = [projectName, buildId].join("/");
