@@ -16,6 +16,13 @@ var riffraff = require('./riffraff');
 
 var region = 'eu-west-1';
 
+var AWS = require('aws-sdk');
+AWS.config = new AWS.Config();
+AWS.config.region = "eu-west-1";
+var frontendS3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID_FRONTEND,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_FRONTEND});
+
 var lambdaOptions = {
     region: region
 };
@@ -129,7 +136,8 @@ gulp.task('buildCloudformation', function() {
 
 //Credentials
 gulp.task('downloadCredentials', function() {
-    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js', { buffer: false })
+    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js',
+     { buffer: false, s3: frontendS3 })
         .pipe(flatten())
         .pipe(gulp.dest('./node_modules'));
 });
