@@ -4,7 +4,7 @@
 
 ### AWS Credentials
 
-Ensure you have valid AWS credentials setup in `~/.aws/credentials`
+Ensure you have valid AWS credentials setup in `~/.aws/credentials` (for the frontend account)
 
 
 ### NPM, Gulp and Typescript
