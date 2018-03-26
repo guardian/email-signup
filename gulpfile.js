@@ -3,7 +3,7 @@ var gulp   = require('gulp');
 var lambda = require('gulp-awslambda');
 var zip    = require('gulp-zip');
 var yaml = require('gulp-yaml');
-var s3 = require('vinyl-s3');
+var vinylS3 = require('vinyl-s3');
 var fail   = require('gulp-fail');
 var flatten = require('gulp-flatten');
 var runSequence = require('run-sequence');
@@ -72,7 +72,7 @@ gulp.task('buildEmailIngestHandler', ['writeConfig'], function() {
 gulp.task('uploadEmailIngestHandler', function() {
     var emailIngestHandler = 'email-ingest-handler-' + env +'.zip';
     return fs.src('dist/email-ingest/' + emailIngestHandler)
-        .pipe(s3.dest({
+        .pipe(vinylS3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
         }));
@@ -105,7 +105,7 @@ gulp.task('buildSubscribeHandler', ['writeConfig'], function() {
 gulp.task('uploadSubscribeHandler', function() {
     var subscribeHandler = 'subscribe-handler-' + env +'.zip';
     return fs.src('dist/exact-target-handler/' + subscribeHandler)
-        .pipe(s3.dest({
+        .pipe(vinylS3.dest({
             Bucket: 'aws-frontend-artifacts',
             Key: 'lambda'
         }));
@@ -136,7 +136,7 @@ gulp.task('buildCloudformation', function() {
 
 //Credentials
 gulp.task('downloadCredentials', function() {
-    return s3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js',
+    return vinylS3.src('s3://aws-frontend-artifacts/lambda/email-signup-config-*.js',
      { buffer: false, s3: frontendS3 })
         .pipe(flatten())
         .pipe(gulp.dest('./node_modules'));
