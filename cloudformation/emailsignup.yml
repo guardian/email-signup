@@ -49,7 +49,7 @@ Resources:
         Ingestion stream handler, this puts into ExactTarget and puts success
         failure onto a different stream.
       Handler: triggersubscriberhandler.handleKinesisEvent
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       Role:
         Ref: LambdaRole
       Timeout: 15
